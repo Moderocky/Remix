@@ -14,10 +14,6 @@ public interface Element {
         return previous;
     }
     
-    default Flag[] insideFlags() {
-        return new Flag[0];
-    }
-    
     default boolean hasHeader() {
         return false;
     }
@@ -32,6 +28,10 @@ public interface Element {
     
     default void open(Context context) {
         context.addFlags(this.insideFlags());
+    }
+    
+    default Flag[] insideFlags() {
+        return new Flag[0];
     }
     
     default void close(Context context) {

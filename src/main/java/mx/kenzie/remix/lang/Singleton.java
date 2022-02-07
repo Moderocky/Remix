@@ -2,7 +2,6 @@ package mx.kenzie.remix.lang;
 
 import mx.kenzie.remix.compiler.Context;
 import mx.kenzie.remix.parser.ConsumerFlag;
-import mx.kenzie.remix.parser.Flag;
 
 public interface Singleton extends Element {
     
@@ -16,14 +15,14 @@ public interface Singleton extends Element {
         return true;
     }
     
-    ConsumerFlag flag();
-    
-    void writeSingle(Context context, String string);
-    
     @Override
     default void write(Context context, String string) {
         context.removeFlags(this.flag());
         this.writeSingle(context, string);
     }
+    
+    void writeSingle(Context context, String string);
+    
+    ConsumerFlag flag();
     
 }

@@ -9,7 +9,7 @@ import mx.kenzie.remix.parser.ConsumerFlag;
 public class KeywordExtends implements Keyword, Element {
     @Override
     public boolean isValid(Context context) {
-        if (!context.hasAnyFlags(ConsumerFlag.HEADER_TYPE_NAME, ConsumerFlag.HEADER_TYPE_EXT)) return false;
+        if (context.hasAnyFlags(ConsumerFlag.HEADER_TYPE_NAME, ConsumerFlag.HEADER_TYPE_EXT)) return false;
         return context.hasAllFlags(AreaFlag.HEADER_TYPE);
     }
     

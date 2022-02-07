@@ -9,12 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TypeStub {
     
+    protected final HashSet<MethodStub> methods;
+    protected final HashSet<FieldStub> fields;
     protected String name;
     protected TypeStub component;
     protected TypeStub superclass;
     protected TypeStub[] interfaces;
-    protected final HashSet<MethodStub> methods;
-    protected final HashSet<FieldStub> fields;
     protected boolean primitive;
     
     protected TypeStub(String name, TypeStub superclass, TypeStub... interfaces) {
@@ -23,6 +23,30 @@ public class TypeStub {
         this.interfaces = interfaces;
         this.methods = new HashSet<>();
         this.fields = new HashSet<>();
+    }
+    
+    public static TypeStub of(String name, TypeStub superclass, TypeStub... interfaces) {
+        return new TypeStub(name, superclass, interfaces);
+    }
+    
+    public static TypeStub of(String name) {
+        return new TypeStub(name, TypeStub.of(Object.class));
+    }
+    
+    public static TypeStub of(Class<?> thing) {
+        if (thing == null) return null;
+        if (SealedTypeStub.CLASS_CACHE.containsKey(thing)) {
+            return SealedTypeStub.CLASS_CACHE.get(thing);
+        }
+        return new SealedTypeStub(thing);
+    }
+    
+    public static TypeStub[] of(Class<?>... things) {
+        final TypeStub[] stubs = new TypeStub[things.length];
+        for (int i = 0; i < things.length; i++) {
+            stubs[i] = of(things[i]);
+        }
+        return stubs;
     }
     
     public boolean primitive() {
@@ -171,6 +195,11 @@ public class TypeStub {
     }
     
     @Override
+    public int hashCode() {
+        return Objects.hash(name, superclass, Arrays.hashCode(interfaces));
+    }
+    
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
@@ -181,43 +210,14 @@ public class TypeStub {
     }
     
     @Override
-    public int hashCode() {
-        return Objects.hash(name, superclass, Arrays.hashCode(interfaces));
-    }
-    
-    @Override
     public String toString() {
-        return "TypeStub[name=" + name +  ']';
-    }
-    
-    public static TypeStub of(String name, TypeStub superclass, TypeStub... interfaces) {
-        return new TypeStub(name, superclass, interfaces);
-    }
-    
-    public static TypeStub of(String name) {
-        return new TypeStub(name, TypeStub.of(Object.class));
-    }
-    
-    public static TypeStub of(Class<?> thing) {
-        if (thing == null) return null;
-        if (SealedTypeStub.CLASS_CACHE.containsKey(thing)) {
-            return SealedTypeStub.CLASS_CACHE.get(thing);
-        }
-        return new SealedTypeStub(thing);
-    }
-    
-    public static TypeStub[] of(Class<?>... things) {
-        final TypeStub[] stubs = new TypeStub[things.length];
-        for (int i = 0; i < things.length; i++) {
-            stubs[i] = of(things[i]);
-        }
-        return stubs;
+        return "TypeStub[name=" + name + ']';
     }
     
     static final class SealedTypeStub extends TypeStub {
         
         private static final Map<Class<?>, TypeStub> CLASS_CACHE = new ConcurrentHashMap<>();
-    
+        
         public SealedTypeStub(Class<?> thing) {
             super(thing.getName().replace('.', '/'), of(thing.getSuperclass()), of(thing.getInterfaces()));
             CLASS_CACHE.put(thing, this);
@@ -232,24 +232,24 @@ public class TypeStub {
                 this.fields.add(new FieldStub(field));
             }
         }
-    
-        @Override
-        public void merge(TypeStub stub) {
-        }
-    
+        
         @Override
         public TypeStub setName(String name) {
             return this;
         }
-    
+        
         @Override
         public TypeStub setSuperclass(TypeStub superclass) {
             return this;
         }
-    
+        
         @Override
         public TypeStub setInterfaces(TypeStub[] interfaces) {
             return this;
+        }
+        
+        @Override
+        public void merge(TypeStub stub) {
         }
         
     }

@@ -8,13 +8,13 @@ import mx.kenzie.remix.parser.ConsumerFlag;
 public class TypeName implements Singleton, Element {
     
     @Override
-    public ConsumerFlag flag() {
-        return ConsumerFlag.HEADER_TYPE_NAME;
+    public void writeSingle(Context context, String string) {
+        context.startType(string);
     }
     
     @Override
-    public void writeSingle(Context context, String string) {
-        context.startType(string);
+    public ConsumerFlag flag() {
+        return ConsumerFlag.HEADER_TYPE_NAME;
     }
     
 }

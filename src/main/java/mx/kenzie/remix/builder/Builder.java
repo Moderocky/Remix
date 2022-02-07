@@ -8,7 +8,7 @@ interface Builder {
     
     default TypeStub[] addAny(TypeStub[] stubs, TypeStub stub) {
         final TypeStub[] array = Arrays.copyOf(stubs, stubs.length + 1);
-        array[array.length-1] = stub;
+        array[array.length - 1] = stub;
         return array;
     }
     
@@ -16,7 +16,7 @@ interface Builder {
         Arrays.sort(stubs);
         if (Arrays.binarySearch(stubs, stub) > -1) return stubs;
         final TypeStub[] array = Arrays.copyOf(stubs, stubs.length + 1);
-        array[array.length-1] = stub;
+        array[array.length - 1] = stub;
         return array;
     }
     

@@ -18,10 +18,15 @@ public class RemixParser implements Closeable {
     
     protected final InputStreamController stream;
     protected final StreamReader reader;
+    protected final List<Element> current;
     protected volatile boolean parse;
     protected volatile ParseMode mode;
-    protected final List<Element> current;
     protected volatile Context context;
+    
+    public RemixParser(InputStream stream, Context context) {
+        this(stream);
+        this.context = context;
+    }
     
     public RemixParser(InputStream stream) {
         this.stream = Stream.controller(stream);
@@ -30,6 +35,7 @@ public class RemixParser implements Closeable {
     }
     
     public synchronized void parse() throws IOException {
+        this.parse = true;
         this.mode = ParseMode.WORD;
         while (parse && !reader.isEmpty()) {
             this.step();
@@ -40,8 +46,16 @@ public class RemixParser implements Closeable {
         this.reader.readWhitespace();
         if (reader.isEmpty()) return;
         switch (reader.upcoming()) {
-            case ':' -> this.current().open(context);
-            case ';' -> this.current().close(context);
+            case ':' -> {
+                this.current().open(context);
+                this.reader.skip();
+                return;
+            }
+            case ';' -> {
+                this.closeElement();
+                this.reader.skip();
+                return;
+            }
         }
         final String part = mode.read(reader);
         final Element element = context.findElement(part);
@@ -49,18 +63,22 @@ public class RemixParser implements Closeable {
         if (element.hasBody()) this.current(element);
     }
     
-    @Override
-    public void close() throws IOException {
-        this.stream.close();
-        this.reader.close();
-    }
-    
     protected Element current() {
         return current.get(0);
     }
     
+    protected void closeElement() {
+        this.current.remove(0).close(context);
+    }
+    
     protected void current(Element element) {
         this.current.add(0, element);
+    }
+    
+    @Override
+    public void close() throws IOException {
+        this.stream.close();
+        this.reader.close();
     }
     
     protected boolean isWhitespace(char c) {
