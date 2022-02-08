@@ -1,21 +1,28 @@
 package mx.kenzie.remix.meta;
 
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
-public class TypeStub {
+public class TypeStub implements java.lang.reflect.Type {
     
-    protected final HashSet<MethodStub> methods;
+    protected final HashSet<FunctionStub> methods;
     protected final HashSet<FieldStub> fields;
     protected String name;
     protected TypeStub component;
     protected TypeStub superclass;
     protected TypeStub[] interfaces;
     protected boolean primitive;
+    protected boolean face;
+    protected int modifiers;
     
     protected TypeStub(String name, TypeStub superclass, TypeStub... interfaces) {
         this.name = name;
@@ -23,6 +30,7 @@ public class TypeStub {
         this.interfaces = interfaces;
         this.methods = new HashSet<>();
         this.fields = new HashSet<>();
+        this.modifiers = Modifier.PUBLIC;
     }
     
     public static TypeStub of(String name, TypeStub superclass, TypeStub... interfaces) {
@@ -30,7 +38,18 @@ public class TypeStub {
     }
     
     public static TypeStub of(String name) {
-        return new TypeStub(name, TypeStub.of(Object.class));
+        return switch (name) {
+            case "void" -> TypeStub.of(void.class);
+            case "number" -> TypeStub.of(rmx.number.class);
+            case "integer" -> TypeStub.of(rmx.integer.class);
+            case "decimal" -> TypeStub.of(rmx.decimal.class);
+            case "string" -> TypeStub.of(rmx.string.class);
+            case "error" -> TypeStub.of(rmx.error.class);
+            case "system" -> TypeStub.of(rmx.system.class);
+            case "type" -> TypeStub.of(rmx.type.class);
+            case "object" -> TypeStub.of(rmx.object.class);
+            default -> new TypeStub(name, TypeStub.of(Object.class));
+        };
     }
     
     public static TypeStub of(Class<?> thing) {
@@ -49,12 +68,62 @@ public class TypeStub {
         return stubs;
     }
     
+    @Override
+    public String getTypeName() {
+        return this.toASM().getClassName();
+    }
+    
+    public int conversionCode(TypeStub stub) {
+        return 0;
+    }
+    
+    public int modifiers() {
+        return modifiers;
+    }
+    
+    public void modify(int modifiers) {
+        this.modifiers |= modifiers;
+    }
+    
+    public boolean isInterface() {
+        return face;
+    }
+    
+    public void setInterface(boolean value) {
+        this.face = value;
+    }
+    
     public boolean primitive() {
         return primitive;
     }
     
     public boolean array() {
         return component != null;
+    }
+    
+    public String internal() {
+        return this.toASM().getInternalName();
+    }
+    
+    public String superName() {
+        if (superclass == null) return null;
+        return superclass.internal();
+    }
+    
+    public String[] interfaceNames() {
+        final String[] strings = new String[interfaces.length];
+        for (int i = 0; i < interfaces.length; i++) {
+            strings[i] = interfaces[i].internal();
+        }
+        return strings;
+    }
+    
+    public TypeStub getArrayType() {
+        return new ArrayTypeStub(Type.getType("[" + this.toASM().getDescriptor()), this);
+    }
+    
+    public TypeStub getComponentType() {
+        return component;
     }
     
     public Type toASM() {
@@ -110,34 +179,97 @@ public class TypeStub {
         return null;
     }
     
-    public MethodStub[] methods() {
-        return methods.toArray(new MethodStub[0]);
+    public FunctionStub[] methods() {
+        return methods.toArray(new FunctionStub[0]);
     }
     
-    public void addMethod(MethodStub stub) {
+    public void addMethod(FunctionStub stub) {
         this.methods.add(stub);
     }
     
-    public MethodStub addMethod(TypeStub result, String name, TypeStub... parameters) {
-        final MethodStub stub = new MethodStub(this, result, name, parameters);
+    public FunctionStub addMethod(TypeStub result, String name, TypeStub... parameters) {
+        final FunctionStub stub = new FunctionStub(Modifier.PUBLIC, this, result, name, parameters);
         this.methods.add(stub);
         return stub;
     }
     
-    public MethodStub[] getMethods(String name) {
-        final List<MethodStub> list = new ArrayList<>();
-        for (final MethodStub method : methods) {
-            if (method.name().equals(name)) list.add(method);
-        }
-        return list.toArray(new MethodStub[0]);
+    public boolean wide() {
+        return false;
     }
     
-    public MethodStub getMethod(String name, TypeStub... parameters) {
-        for (final MethodStub method : methods) {
+    public int offset() {
+        return 5;
+    }
+    
+    public Consumer<MethodVisitor> typeLiteral() {
+        return visitor -> visitor.visitLdcInsn(Type.getObjectType(this.internal()));
+    }
+    
+    public Consumer<MethodVisitor> newInstance() {
+        return visitor -> {
+            visitor.visitTypeInsn(187, this.internal());
+            visitor.visitInsn(89);
+            visitor.visitMethodInsn(183, this.internal(), "<init>", "()V", false);
+        };
+    }
+    
+    public FunctionStub[] getMethods(String name) {
+        final List<FunctionStub> list = new ArrayList<>();
+        for (final FunctionStub method : methods) {
+            if (method.name().equals(name)) list.add(method);
+        }
+        return list.toArray(new FunctionStub[0]);
+    }
+    
+    public FunctionStub getMethod(String name, TypeStub... parameters) {
+        for (final FunctionStub method : methods) {
             if (!method.name().equals(name)) continue;
             if (Arrays.equals(method.parameters(), parameters)) return method;
         }
+        for (final FunctionStub method : methods) {
+            if (!method.name().equals("<init>")) continue;
+            if (method.canAccept(parameters)) return method;
+        }
         return null;
+    }
+    
+    public FunctionStub getConstructor(TypeStub... parameters) {
+        for (final FunctionStub method : methods) {
+            if (!method.name().equals("<init>")) continue;
+            if (Arrays.equals(method.parameters(), parameters)) return method;
+        }
+        for (final FunctionStub method : methods) {
+            if (!method.name().equals("<init>")) continue;
+            if (method.canAccept(parameters)) return method;
+        }
+        return null;
+    }
+    
+    public boolean canCastTo(TypeStub stub) {
+        return stub.canCast(this);
+    }
+    
+    public boolean canCast(TypeStub stub) {
+        if (this.equals(stub)) return true;
+        {
+            final List<TypeStub> ours, theirs;
+            ours = this.allSuperclasses();
+            theirs = stub.allSuperclasses();
+            for (final TypeStub our : ours) {
+                if (stub.equals(our)) return true;
+                if (theirs.contains(our)) return true;
+            }
+        }
+        {
+            final List<TypeStub> ours, theirs;
+            ours = this.allInterfaces();
+            theirs = stub.allInterfaces();
+            for (final TypeStub our : ours) {
+                if (stub.equals(our)) return true;
+                if (theirs.contains(our)) return true;
+            }
+        }
+        return false;
     }
     
     public void merge(TypeStub stub) {
@@ -214,44 +346,124 @@ public class TypeStub {
         return "TypeStub[name=" + name + ']';
     }
     
-    static final class SealedTypeStub extends TypeStub {
-        
-        private static final Map<Class<?>, TypeStub> CLASS_CACHE = new ConcurrentHashMap<>();
-        
-        public SealedTypeStub(Class<?> thing) {
-            super(thing.getName().replace('.', '/'), of(thing.getSuperclass()), of(thing.getInterfaces()));
-            CLASS_CACHE.put(thing, this);
-            this.primitive = thing.isPrimitive();
-            if (thing.isArray()) {
-                this.component = TypeStub.of(thing.getComponentType());
-            }
-            for (final Method method : thing.getMethods()) {
-                this.methods.add(new MethodStub(method));
-            }
-            for (final Field field : thing.getFields()) {
-                this.fields.add(new FieldStub(field));
-            }
+}
+
+final class ArrayTypeStub extends TypeStub {
+    
+    private final Type type;
+    
+    public ArrayTypeStub(Type type, TypeStub component) {
+        super(component.name + "[]", TypeStub.of(Object.class));
+        this.component = component;
+        this.type = type;
+    }
+    
+    @Override
+    public boolean array() {
+        return true;
+    }
+    
+    @Override
+    public Type toASM() {
+        return type;
+    }
+}
+
+final class SealedTypeStub extends TypeStub {
+    
+    static final Map<Class<?>, TypeStub> CLASS_CACHE = new ConcurrentHashMap<>();
+    
+    private final Class<?> type;
+    
+    public SealedTypeStub(Class<?> thing) {
+        super(thing.getName().replace('.', '/'), of(thing.getSuperclass()), of(thing.getInterfaces()));
+        this.type = thing;
+        this.face = thing.isInterface();
+        this.modifiers = thing.getModifiers();
+        CLASS_CACHE.put(thing, this);
+        this.primitive = thing.isPrimitive();
+        if (thing.isArray()) {
+            this.component = TypeStub.of(thing.getComponentType());
         }
-        
-        @Override
-        public TypeStub setName(String name) {
-            return this;
+        for (final Method method : thing.getMethods()) {
+            this.methods.add(new FunctionStub(method));
         }
-        
-        @Override
-        public TypeStub setSuperclass(TypeStub superclass) {
-            return this;
+        for (final Field field : thing.getFields()) {
+            this.fields.add(new FieldStub(field));
         }
-        
-        @Override
-        public TypeStub setInterfaces(TypeStub[] interfaces) {
-            return this;
+        for (final Constructor<?> constructor : thing.getConstructors()) {
+            this.methods.add(new FunctionStub(constructor));
         }
-        
-        @Override
-        public void merge(TypeStub stub) {
-        }
-        
+    }
+    
+    @Override
+    public int conversionCode(TypeStub stub) {
+        if (!(stub instanceof SealedTypeStub sealed)) return 0;
+        if (!sealed.primitive) return 0;
+        if (type == int.class && sealed.type == byte.class) return Opcodes.I2B;
+        if (type == int.class && sealed.type == short.class) return Opcodes.I2S;
+        if (type == int.class && sealed.type == long.class) return Opcodes.I2L;
+        if (type == int.class && sealed.type == float.class) return Opcodes.I2F;
+        if (type == int.class && sealed.type == double.class) return Opcodes.I2D;
+        return 0;
+    }
+    
+    @Override
+    public boolean array() {
+        return type.isArray();
+    }
+    
+    @Override
+    public TypeStub getArrayType() {
+        return TypeStub.of(type.arrayType());
+    }
+    
+    @Override
+    public TypeStub getComponentType() {
+        return TypeStub.of(type.getComponentType());
+    }
+    
+    @Override
+    public Type toASM() {
+        return Type.getType(type);
+    }
+    
+    @Override
+    public TypeStub setName(String name) {
+        return this;
+    }
+    
+    @Override
+    public TypeStub setSuperclass(TypeStub superclass) {
+        return this;
+    }
+    
+    @Override
+    public TypeStub setInterfaces(TypeStub[] interfaces) {
+        return this;
+    }
+    
+    @Override
+    public boolean wide() {
+        return type == long.class || type == double.class;
+    }
+    
+    @Override
+    public int offset() {
+        if (type == void.class) return 6;
+        else if (type == int.class) return 1;
+        else if (type == boolean.class) return 1;
+        else if (type == byte.class) return 1;
+        else if (type == short.class) return 1;
+        else if (type == char.class) return 1;
+        else if (type == long.class) return 2;
+        else if (type == float.class) return 3;
+        else if (type == double.class) return 4;
+        else return 5;
+    }
+    
+    @Override
+    public void merge(TypeStub stub) {
     }
     
 }

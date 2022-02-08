@@ -16,7 +16,7 @@ public class KeywordFunction implements Keyword, Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        return string.equals("func");
+        return string.equals("func") && context.check() == null;
     }
     
     @Override
@@ -43,11 +43,12 @@ public class KeywordFunction implements Keyword, Element {
         if (context.hasAnyFlags(ConsumerFlag.HEADER_FUNC_PARAM_NAME))
             context.error("Function has trailing parameter type.");
         context.removeFlags(AreaFlag.HEADER_FUNC, ConsumerFlag.HEADER_FUNC_PARAM_TYPE);
-        context.addFlags(AreaFlag.BODY_FUNC);
+        context.addFlags(AreaFlag.BODY_FUNC, AreaFlag.INSTRUCTION_AREA);
     }
     
     @Override
     public void close(Context context) {
-        context.removeFlags(AreaFlag.BODY_FUNC);
+        context.removeFlags(AreaFlag.BODY_FUNC, AreaFlag.INSTRUCTION_AREA);
+        context.empty();
     }
 }

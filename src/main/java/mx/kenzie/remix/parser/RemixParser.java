@@ -46,21 +46,24 @@ public class RemixParser implements Closeable {
         this.reader.readWhitespace();
         if (reader.isEmpty()) return;
         switch (reader.upcoming()) {
-            case ':' -> {
+            case DOWN -> {
                 this.current().open(context);
                 this.reader.skip();
                 return;
             }
-            case ';' -> {
-                this.closeElement();
+            case UP -> {
+                this.closeElement(); // todo needs to change
                 this.reader.skip();
                 return;
             }
+            case '.' -> this.mode = ParseMode.DOT_WORD;
+            case '"' -> this.mode = ParseMode.STRING;
         }
         final String part = mode.read(reader);
         final Element element = context.findElement(part);
         element.write(context, part);
         if (element.hasBody()) this.current(element);
+        this.mode = ParseMode.WORD;
     }
     
     protected Element current() {
@@ -68,7 +71,8 @@ public class RemixParser implements Closeable {
     }
     
     protected void closeElement() {
-        this.current.remove(0).close(context);
+        final Element element = this.current.remove(0);
+        element.close(context);
     }
     
     protected void current(Element element) {

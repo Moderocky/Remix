@@ -1,5 +1,6 @@
 package mx.kenzie.remix.compiler;
 
+import mx.kenzie.remix.builder.FieldBuilder;
 import mx.kenzie.remix.builder.FunctionBuilder;
 import mx.kenzie.remix.builder.TypeBuilder;
 import mx.kenzie.remix.lang.Element;
@@ -8,9 +9,6 @@ import mx.kenzie.remix.meta.Variable;
 import mx.kenzie.remix.parser.Flag;
 import org.objectweb.asm.MethodVisitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 
 public interface Context {
@@ -35,13 +33,18 @@ public interface Context {
         return null;
     }
     
-    default Element[] validElements() {
-        final List<Element> list = new ArrayList<>(Arrays.asList(this.availableElements()));
-        list.removeIf(element -> !element.isValid(this));
-        return list.toArray(new Element[0]);
-    }
+    Element[] validElements();
     
     Element[] availableElements();
+    
+    default boolean hasType(String name) {
+        for (final TypeStub stub : this.availableTypes()) {
+            if (stub.name().equals(name)) return true;
+        }
+        return false;
+    }
+    
+    TypeStub[] availableTypes();
     
     default TypeStub findType(String name) {
         return this.findType(TypeStub.of(name));
@@ -57,8 +60,6 @@ public interface Context {
         return stub;
     }
     
-    TypeStub[] availableTypes();
-    
     void registerType(TypeStub type);
     
     default TypeStub findType(String name, TypeStub superclass) {
@@ -68,6 +69,10 @@ public interface Context {
     default TypeStub findType(String name, TypeStub superclass, TypeStub... interfaces) {
         return this.findType(TypeStub.of(name, superclass, interfaces));
     }
+    
+    FieldBuilder startField(String name);
+    
+    FieldBuilder currentField();
     
     FunctionBuilder startFunction(String name);
     
@@ -89,4 +94,13 @@ public interface Context {
     
     int slot(Variable variable);
     
+    TypeStub pop();
+    
+    TypeStub check();
+    
+    void push(TypeStub stub);
+    
+    void prepareModifier(int modifier);
+    
+    void empty();
 }

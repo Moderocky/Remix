@@ -6,16 +6,15 @@ import java.util.Arrays;
 
 interface Builder {
     
-    default TypeStub[] addAny(TypeStub[] stubs, TypeStub stub) {
-        final TypeStub[] array = Arrays.copyOf(stubs, stubs.length + 1);
-        array[array.length - 1] = stub;
-        return array;
+    default TypeStub[] add(TypeStub[] stubs, TypeStub stub) {
+        for (final TypeStub typeStub : stubs) {
+            if (typeStub.equals(stub)) return stubs;
+        }
+        return this.addAny(stubs, stub);
     }
     
-    default TypeStub[] add(TypeStub[] stubs, TypeStub stub) {
-        Arrays.sort(stubs);
-        if (Arrays.binarySearch(stubs, stub) > -1) return stubs;
-        final TypeStub[] array = Arrays.copyOf(stubs, stubs.length + 1);
+    default TypeStub[] addAny(TypeStub[] stubs, TypeStub stub) {
+        final TypeStub[] array = this.grow(stubs);
         array[array.length - 1] = stub;
         return array;
     }

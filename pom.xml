@@ -33,12 +33,6 @@
     <dependencies>
         <dependency>
             <groupId>mx.kenzie</groupId>
-            <artifactId>foundation</artifactId>
-            <version>1.1.6</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>mx.kenzie</groupId>
             <artifactId>jupiter</artifactId>
             <version>1.0.4</version>
             <scope>compile</scope>

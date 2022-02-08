@@ -12,6 +12,12 @@ public enum ParseMode {
             return reader.readWord();
         }
     },
+    DOT_WORD {
+        @Override
+        public String read(StreamReader reader) throws IOException {
+            return (char) reader.read() + reader.readWord();
+        }
+    },
     ANY,
     STRING {
         @Override
