@@ -40,13 +40,13 @@ public class KeywordType implements Keyword, Element {
     }
     
     @Override
-    public void open(Context context) {
+    public void open(Context context, String string) {
         context.removeFlags(AreaFlag.HEADER_TYPE);
         context.addFlags(AreaFlag.BODY_TYPE);
     }
     
     @Override
-    public void close(Context context) {
+    public void close(Context context, String string) {
         context.removeFlags(AreaFlag.BODY_TYPE);
     }
     

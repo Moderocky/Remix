@@ -17,8 +17,9 @@ public class string implements object {
     }
     
     @Override
-    public boolean Frozen() {
-        return frozen;
+    public integer Frozen() {
+        if (frozen) return integer.ONE;
+        return integer.ZERO;
     }
     
     @Override

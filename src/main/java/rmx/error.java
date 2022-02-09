@@ -13,7 +13,7 @@ public class error extends Throwable implements object {
     }
     
     @Override
-    public boolean Frozen() {
-        return true;
+    public integer Frozen() {
+        return integer.ONE;
     }
 }

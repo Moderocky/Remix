@@ -13,7 +13,7 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     
     protected final List<Variable> variables;
     protected final List<Consumer<MethodVisitor>> instructions;
-    protected FunctionStub stub;
+    protected final FunctionStub stub;
     protected boolean returnSet;
     
     public FunctionBuilder(int modifiers, TypeStub owner, String name) {
@@ -52,7 +52,7 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     }
     
     public void addParameter(TypeStub parameter) {
-        this.stub = new FunctionStub(stub.modifiers(), stub.owner(), stub.result(), stub.name(), this.addAny(stub.parameters(), parameter));
+        this.stub.setParameters(this.addAny(stub.parameters(), parameter));
     }
     
     public TypeStub setReturnType(TypeStub result) {
@@ -62,12 +62,12 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
             return result;
         }
         final TypeStub common = stub.result().common(result);
-        this.stub = new FunctionStub(stub.modifiers(), stub.owner(), common, stub.name(), stub.parameters());
+        this.stub.setResult(common);
         return common;
     }
     
     public void forceReturnType(TypeStub result) {
-        this.stub = new FunctionStub(stub.modifiers(), stub.owner(), result, stub.name(), stub.parameters());
+        this.stub.setResult(result);
     }
     
     public void write(Consumer<MethodVisitor> consumer) {

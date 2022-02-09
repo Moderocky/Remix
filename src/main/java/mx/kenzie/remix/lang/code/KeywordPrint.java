@@ -24,13 +24,13 @@ public class KeywordPrint implements Keyword, Element {
     }
     
     @Override
-    public void open(Context context) {
+    public void open(Context context, String string) {
         context.addFlags(AreaFlag.LOAD_VALUE);
         context.write(visitor -> visitor.visitFieldInsn(178, "java/lang/System", "out", PrintStream.class.descriptorString()));
     }
     
     @Override
-    public void close(Context context) {
+    public void close(Context context, String string) {
         context.removeFlags(AreaFlag.LOAD_VALUE);
         context.write(visitor ->
             visitor.visitMethodInsn(182, "java/io/PrintStream", "println", "(Ljava/lang/Object;)V", false)

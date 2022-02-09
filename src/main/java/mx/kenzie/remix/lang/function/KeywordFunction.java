@@ -36,7 +36,7 @@ public class KeywordFunction implements Keyword, Element {
     }
     
     @Override
-    public void open(Context context) {
+    public void open(Context context, String string) {
         if (context.hasAnyFlags(ConsumerFlag.HEADER_FUNC_NAME))
             context.error("Function was given no name.");
         // todo maybe functional interface members have no name?
@@ -47,7 +47,7 @@ public class KeywordFunction implements Keyword, Element {
     }
     
     @Override
-    public void close(Context context) {
+    public void close(Context context, String string) {
         context.removeFlags(AreaFlag.BODY_FUNC, AreaFlag.INSTRUCTION_AREA);
         context.empty();
     }

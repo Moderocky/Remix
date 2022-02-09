@@ -7,8 +7,10 @@ import java.io.Serializable;
 
 public interface object extends Serializable {
     
-    default long Pointer() {
-        return system.system.getAddress(this);
+    object INSTANCE = new object() {};
+    
+    default pointer Pointer() {
+        return new pointer(system.system.getAddress(this));
     }
     
     default byte[] toByteArray() throws IOException {
@@ -19,8 +21,8 @@ public interface object extends Serializable {
         return stream.toByteArray();
     }
     
-    default boolean Frozen() {
-        return false;
+    default integer Frozen() {
+        return integer.ZERO;
     }
     
     default void Freeze() {

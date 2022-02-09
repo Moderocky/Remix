@@ -11,7 +11,7 @@ public interface Element {
     boolean matches(Context context, String string);
     
     default ParseMode nextMode(ParseMode previous) {
-        return previous;
+        return ParseMode.WORD;
     }
     
     default boolean hasHeader() {
@@ -26,7 +26,7 @@ public interface Element {
     
     }
     
-    default void open(Context context) {
+    default void open(Context context, String string) {
         context.addFlags(this.insideFlags());
     }
     
@@ -34,7 +34,7 @@ public interface Element {
         return new Flag[0];
     }
     
-    default void close(Context context) {
+    default void close(Context context, String string) {
         context.removeFlags(this.insideFlags());
     }
     

@@ -222,13 +222,20 @@ public class TypeStub implements java.lang.reflect.Type {
     }
     
     public FunctionStub getMethod(String name, TypeStub... parameters) {
+        final List<FunctionStub> methods = new ArrayList<>(this.methods);
+        methods.removeIf(stub -> !stub.name().equals(name));
         for (final FunctionStub method : methods) {
-            if (!method.name().equals(name)) continue;
             if (Arrays.equals(method.parameters(), parameters)) return method;
         }
         for (final FunctionStub method : methods) {
-            if (!method.name().equals("<init>")) continue;
             if (method.canAccept(parameters)) return method;
+        }
+        for (final TypeStub stub : this.interfaces) {
+            final FunctionStub method = stub.getMethod(name, parameters);
+            if (method != null) return method;
+        }
+        if (this.superclass != null) {
+            return this.superclass.getMethod(name, parameters);
         }
         return null;
     }
@@ -252,24 +259,13 @@ public class TypeStub implements java.lang.reflect.Type {
     public boolean canCast(TypeStub stub) {
         if (this.equals(stub)) return true;
         {
-            final List<TypeStub> ours, theirs;
-            ours = this.allSuperclasses();
-            theirs = stub.allSuperclasses();
-            for (final TypeStub our : ours) {
-                if (stub.equals(our)) return true;
-                if (theirs.contains(our)) return true;
-            }
+            final List<TypeStub> theirs = stub.allSuperclasses();
+            if (theirs.contains(this)) return true;
         }
         {
-            final List<TypeStub> ours, theirs;
-            ours = this.allInterfaces();
-            theirs = stub.allInterfaces();
-            for (final TypeStub our : ours) {
-                if (stub.equals(our)) return true;
-                if (theirs.contains(our)) return true;
-            }
+            final List<TypeStub> theirs = stub.allInterfaces();
+            return theirs.contains(this);
         }
-        return false;
     }
     
     public void merge(TypeStub stub) {
@@ -313,14 +309,9 @@ public class TypeStub implements java.lang.reflect.Type {
     
     public List<TypeStub> allInterfaces() {
         final List<TypeStub> list = new ArrayList<>();
-        TypeStub stub = this;
-        TypeStub face = this.superclass;
-        while (stub.superclass != null) {
-            list.addAll(stub.allInterfaces());
-            stub = stub.superclass;
-        }
-        for (final TypeStub inter : face.interfaces) {
-            list.add(inter);
+        list.addAll(List.of(this.interfaces));
+        if (this.superclass != null) list.addAll(this.superclass.allInterfaces());
+        for (final TypeStub inter : this.interfaces) {
             list.addAll(inter.allInterfaces());
         }
         return list;
@@ -382,6 +373,8 @@ final class SealedTypeStub extends TypeStub {
         this.modifiers = thing.getModifiers();
         CLASS_CACHE.put(thing, this);
         this.primitive = thing.isPrimitive();
+        this.superclass = TypeStub.of(thing.getSuperclass());
+        this.interfaces = TypeStub.of(thing.getInterfaces());
         if (thing.isArray()) {
             this.component = TypeStub.of(thing.getComponentType());
         }

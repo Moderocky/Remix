@@ -25,12 +25,12 @@ public class KeywordReturn implements Keyword, Element {
     }
     
     @Override
-    public void open(Context context) {
+    public void open(Context context, String string) {
         context.addFlags(AreaFlag.RETURN, AreaFlag.LOAD_VALUE);
     }
     
     @Override
-    public void close(Context context) {
+    public void close(Context context, String string) {
         context.removeFlags(AreaFlag.RETURN, AreaFlag.LOAD_VALUE);
         final TypeStub stub = context.pop();
         final int offset = context.currentFunction().setReturnType(stub).offset();

@@ -13,8 +13,8 @@ public class type implements object {
     }
     
     @Override
-    public boolean Frozen() {
-        return true;
+    public integer Frozen() {
+        return integer.ONE;
     }
     
     public Class<?> getType() {

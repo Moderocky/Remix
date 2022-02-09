@@ -27,11 +27,14 @@ public class CompileContext implements Context {
     protected final List<Element> validElements = new ArrayList<>();
     protected final List<FunctionBuilder> function = new ArrayList<>();
     protected final List<TypeStub> stack = new ArrayList<>();
+    private final TrackerQueue trackers = new TrackerQueue();
     protected volatile int maxStack;
     protected volatile int modifier;
     private boolean elementsAreValid = false;
+    private char upcoming;
     
-    public CompileContext(Element... elements) {
+    public CompileContext(TypeStub[] types, Element... elements) {
+        this.types.addAll(List.of(types));
         this.elements = elements;
     }
     
@@ -170,7 +173,19 @@ public class CompileContext implements Context {
     @Override
     public TypeStub pop() {
         if (stack.isEmpty()) return null;
+        this.trackers.count(-1);
         return stack.remove(0);
+    }
+    
+    @Override
+    public TypeStub[] pop(int amount) {
+        if (stack.isEmpty()) return new TypeStub[amount];
+        final List<TypeStub> stubs = new ArrayList<>();
+        for (int i = 0; i < amount; i++) {
+            stubs.add(stack.remove(0));
+        }
+        this.trackers.count(amount * -1);
+        return stubs.toArray(new TypeStub[0]);
     }
     
     @Override
@@ -181,7 +196,9 @@ public class CompileContext implements Context {
     
     @Override
     public void push(TypeStub stub) {
+        if (stub == null || stub.equals(TypeStub.of(void.class))) return;
         this.stack.add(0, stub);
+        this.trackers.count(1);
         if (maxStack < stack.size()) maxStack = stack.size();
     }
     
@@ -192,7 +209,62 @@ public class CompileContext implements Context {
     
     @Override
     public void empty() {
+        final int amount = this.stack.size();
         this.stack.clear();
+        this.trackers.count(amount * -1);
     }
     
+    @Override
+    public void setUpcoming(char c) {
+        this.upcoming = c;
+    }
+    
+    @Override
+    public char upcoming() {
+        return upcoming;
+    }
+    
+    @Override
+    public FunctionStub findFunction(String name) {
+        final TypeStub stub = this.check();
+        if (stub.equals(this.getType()))
+            return this.findLocalFunction(name);
+        final FunctionStub[] functions = stub.getMethods(name);
+        if (functions.length > 0) return functions[0];
+        return null;
+    }
+    
+    @Override
+    public FunctionStub findFunction(String name, TypeStub... parameters) {
+        final TypeStub stub = this.check();
+        if (stub.equals(this.getType()))
+            return this.findLocalFunction(name, parameters);
+        return stub.getMethod(name, parameters);
+    }
+    
+    private FunctionStub findLocalFunction(String name, TypeStub... parameters) {
+        for (final FunctionStub function : this.functions) {
+            if (!function.name().equals(name)) continue;
+            if (function.canAccept(parameters)) return function;
+        }
+        return null;
+    }
+    
+    @Override
+    public void openTracker() {
+        trackers.open();
+    }
+    
+    @Override
+    public int closeTracker() {
+        return trackers.close();
+    }
+    
+    private FunctionStub findLocalFunction(String name) {
+        for (final FunctionStub function : this.functions) {
+            if (!function.name().equals(name)) continue;
+            if (function.parameters().length == 0) return function;
+        }
+        return null;
+    }
 }

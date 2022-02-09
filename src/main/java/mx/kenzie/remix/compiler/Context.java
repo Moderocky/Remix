@@ -4,6 +4,7 @@ import mx.kenzie.remix.builder.FieldBuilder;
 import mx.kenzie.remix.builder.FunctionBuilder;
 import mx.kenzie.remix.builder.TypeBuilder;
 import mx.kenzie.remix.lang.Element;
+import mx.kenzie.remix.meta.FunctionStub;
 import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.meta.Variable;
 import mx.kenzie.remix.parser.Flag;
@@ -96,6 +97,8 @@ public interface Context {
     
     TypeStub pop();
     
+    TypeStub[] pop(int amount);
+    
     TypeStub check();
     
     void push(TypeStub stub);
@@ -103,4 +106,16 @@ public interface Context {
     void prepareModifier(int modifier);
     
     void empty();
+    
+    void setUpcoming(char c);
+    
+    char upcoming();
+    
+    FunctionStub findFunction(String name);
+    
+    FunctionStub findFunction(String name, TypeStub... parameters);
+    
+    void openTracker();
+    
+    int closeTracker();
 }
