@@ -22,6 +22,14 @@ public class system extends PrintStream implements InternalAccess.AccessUnsafe, 
         return rmx.system.system;
     }
     
+    public void Exit() {
+        System.exit(0);
+    }
+    
+    public void Exit(number number) {
+        System.exit(number.booleanValue());
+    }
+    
     public void Error(Throwable throwable) {
         this.unsafe.throwException(throwable);
     }

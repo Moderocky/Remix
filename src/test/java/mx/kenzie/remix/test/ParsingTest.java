@@ -61,7 +61,7 @@ public class ParsingTest {
             new KeywordDuplicate(),
             new KeywordPop(),
             new KeywordSwap(),
-            new KeywordReturn(),
+            new KeywordExit(),
             new KeywordAllocate(),
             new TypeAllocate(),
             new KeywordNew(),
@@ -86,7 +86,7 @@ public class ParsingTest {
                 trans object blob
                 
                 func TestFunc:
-                    return: "hello";
+                    exit: "hello";
                 ;
                 
                 func MyFunc string name:

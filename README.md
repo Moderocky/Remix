@@ -94,3 +94,25 @@ At the virtual machine stage:
 | Cloning    | Create direct memory clones of any object.                           | `object.Clone`   |
 | Pointers   | Access/retrieve native memory pointers of an object.                 | `object.Pointer` |
 | Freezing   | Mark an object as frozen, preventing it being altered.               | `object.Freeze`  |
+
+## Keywords
+
+A list of control keywords available in the language.
+RMX keywords are not reserved words, but will always take preference over other usages in valid situations.
+For example, the first `house` usage in `this house house: ;` would be identified as a type (for a variable assignment) but if it were replaced with `cast` (see `this cast house:;`) then the `cast` keyword would take priority.
+
+| Keyword | Description                                              |
+|---------|----------------------------------------------------------|
+| `type`  | Declare a new object-type.                               |
+| `is`    | Declare or check for type inheritance.                   |
+| `trans` | Declare a field as being transient.                      |
+| `func`  | Begin a function.                                        |
+| `oper`  | Begin an operator.                                       |
+| `if`    | Run a branch conditionally.                              |
+| `new`   | Create a new object. Can be overloaded like an operator. |
+| `alloc` | Create a zero-instance of an object.                     |
+| `cast`  | Convert an object to another (compatible) type.          |
+| `dup`   | Duplicate an object reference.                           |
+| `pop`   | Discard an object reference.                             |
+| `swap`  | Swap the most recent two object references.              |
+| `exit`  | Exit the current function.                               |

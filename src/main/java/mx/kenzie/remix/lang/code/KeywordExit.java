@@ -7,7 +7,7 @@ import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.parser.AreaFlag;
 
 
-public class KeywordReturn implements Keyword, Element {
+public class KeywordExit implements Keyword, Element {
     
     @Override
     public boolean isValid(Context context) {
@@ -16,7 +16,7 @@ public class KeywordReturn implements Keyword, Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        return "return".equals(string);
+        return "exit".equals(string);
     }
     
     @Override
