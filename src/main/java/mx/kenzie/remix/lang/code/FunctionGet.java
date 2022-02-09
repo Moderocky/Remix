@@ -17,7 +17,11 @@ public class FunctionGet implements Element {
     public boolean matches(Context context, String string) {
         if (!string.startsWith(".")) return false;
         if (context.upcoming() == ':') return false;
-        return context.check() != null;
+        if (context.check() == null) {
+            context.error("Function calls require a preceding value to call from.");
+            return false;
+        }
+        return true;
     }
     
     @Override

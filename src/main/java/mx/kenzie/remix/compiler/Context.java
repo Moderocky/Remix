@@ -93,6 +93,10 @@ public interface Context {
     
     void error(String message);
     
+    void clearErrors();
+    
+    String[] errors();
+    
     int slot(Variable variable);
     
     TypeStub pop();

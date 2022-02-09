@@ -3,10 +3,10 @@ package mx.kenzie.remix.lang.code;
 import mx.kenzie.remix.compiler.Context;
 import mx.kenzie.remix.lang.Element;
 import mx.kenzie.remix.lang.Keyword;
+import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.parser.AreaFlag;
-import mx.kenzie.remix.parser.ConsumerFlag;
 
-public class KeywordCast implements Keyword, Element {
+public class KeywordSwap implements Keyword, Element {
     
     @Override
     public boolean isValid(Context context) {
@@ -15,9 +15,9 @@ public class KeywordCast implements Keyword, Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        if (!"cast".equals(string)) return false;
+        if (!"swap".equals(string)) return false;
         if (context.check() == null) {
-            context.error("Casting requires a preceding value to convert.");
+            context.error("Swapping requires two preceding values to swap.");
             return false;
         }
         return true;
@@ -25,6 +25,9 @@ public class KeywordCast implements Keyword, Element {
     
     @Override
     public void write(Context context, String string) {
-        context.addFlags(ConsumerFlag.CAST);
+        context.write(visitor -> visitor.visitInsn(95));
+        final TypeStub[] stubs = context.pop(2);
+        context.push(stubs[1]);
+        context.push(stubs[0]);
     }
 }

@@ -14,7 +14,12 @@ public class KeywordDuplicate implements Keyword, Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        return "dup".equals(string) && context.check() != null;
+        if (!"dup".equals(string)) return false;
+        if (context.check() == null) {
+            context.error("Duplicating requires a preceding value.");
+            return false;
+        }
+        return true;
     }
     
     @Override

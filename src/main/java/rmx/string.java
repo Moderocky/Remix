@@ -40,7 +40,7 @@ public class string implements object {
     }
     
     @Override
-    public integer Boolean() {
+    public integer Bool() {
         if (!value.isEmpty()) return integer.ONE;
         return integer.ZERO;
     }

@@ -28,6 +28,7 @@ public class CompileContext implements Context {
     protected final List<FunctionBuilder> function = new ArrayList<>();
     protected final List<TypeStub> stack = new ArrayList<>();
     private final TrackerQueue trackers = new TrackerQueue();
+    private final List<String> errors = new ArrayList<>();
     protected volatile int maxStack;
     protected volatile int modifier;
     private boolean elementsAreValid = false;
@@ -161,8 +162,17 @@ public class CompileContext implements Context {
     
     @Override
     public void error(String message) {
-        throw new RuntimeException(message);
-        // todo proper error
+        this.errors.add(message);
+    }
+    
+    @Override
+    public void clearErrors() {
+        this.errors.clear();
+    }
+    
+    @Override
+    public String[] errors() {
+        return errors.toArray(new String[0]);
     }
     
     @Override

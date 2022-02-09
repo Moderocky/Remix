@@ -60,8 +60,8 @@ public class ParsingTest {
             
             new KeywordDuplicate(),
             new KeywordPop(),
+            new KeywordSwap(),
             new KeywordReturn(),
-            new KeywordPrint(), // test only
             new KeywordAllocate(),
             new TypeAllocate(),
             new KeywordNew(),

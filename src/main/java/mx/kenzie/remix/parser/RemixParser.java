@@ -61,13 +61,20 @@ public class RemixParser implements Closeable {
             case '.' -> this.mode = ParseMode.DOT_WORD;
             case '"' -> this.mode = ParseMode.STRING;
         }
+        this.context.clearErrors();
         final String part = mode.read(reader);
         if (!reader.isEmpty()) {
             this.reader.readWhitespace();
             this.context.setUpcoming(reader.upcoming());
         }
         final Element element = context.findElement(part);
-        assert element != null : part + ": evaluated to null";
+        if (element == null) {
+            final String[] errors = context.errors();
+            if (errors.length == 0)
+                throw new RuntimeException("Parser could not identify '" + part + "'.");
+            throw new RuntimeException("Parser could not identify '" + part + "'.\nBelow are some suggestions:\n\t"
+                + String.join("\n\t", errors));
+        }
         element.write(context, part);
         if (element.hasBody()) this.current(element, part);
         this.mode = element.nextMode(mode);
