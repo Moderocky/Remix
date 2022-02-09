@@ -42,7 +42,6 @@ public class system extends PrintStream implements InternalAccess.AccessUnsafe, 
             if (Modifier.isStatic(field.getModifiers())) continue;
             if (field.getType().isPrimitive()) continue;
             final long offset = unsafe.objectFieldOffset(field);
-            System.out.println(field); // todo
             if (!object.class.isAssignableFrom(field.getType()))
                 this.unsafe.putObject(thing, offset, unsafe.allocateInstance(field.getType()));
             else this.unsafe.putObject(thing, offset, this.Allocate(field.getType()));

@@ -33,8 +33,6 @@ public final class FunctionStub {
     }
     
     public boolean canAccept(TypeStub... parameters) {
-        System.out.println(Arrays.toString(parameters)); // todo
-        System.out.println(Arrays.toString(this.parameters)); // todo
         if (parameters.length != this.parameters.length) return false;
         if (Arrays.equals(this.parameters, parameters)) return true;
         for (int i = 0; i < parameters.length; i++) {
