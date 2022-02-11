@@ -18,6 +18,18 @@ public enum ParseMode {
             return (char) reader.read() + reader.readWord();
         }
     },
+    SYMBOL {
+        @Override
+        public String read(StreamReader reader) throws IOException {
+            return "" + (char) reader.read();
+        }
+    },
+    SYMBOL_2 {
+        @Override
+        public String read(StreamReader reader) throws IOException {
+            return (char) reader.read() + "" + (char) reader.read();
+        }
+    },
     ANY,
     STRING {
         @Override

@@ -30,15 +30,23 @@ public class system extends PrintStream implements InternalAccess.AccessUnsafe, 
         System.exit(number.booleanValue());
     }
     
-    public void Error(Throwable throwable) {
+    public void Error(string message) {
+        this.Error(new error(message));
+    }
+    
+    public void Error(error throwable) {
         this.unsafe.throwException(throwable);
     }
     
     public void Error(String message) {
-        this.Error(new Exception(message));
+        this.Error(new error(message));
     }
     
     public void Print(Object object) {
+        this.println(object);
+    }
+    
+    public void Print(object object) {
         this.println(object);
     }
     

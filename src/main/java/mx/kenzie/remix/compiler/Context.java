@@ -24,6 +24,14 @@ public interface Context {
     
     boolean hasAnyFlags(Flag... flags);
     
+    default void buffer(Consumer<MethodVisitor> consumer) {
+        this.buffer(consumer, 0, null);
+    }
+    
+    void buffer(Consumer<MethodVisitor> consumer, int pop, TypeStub push);
+    
+    void emptyBuffer();
+    
     void write(Consumer<MethodVisitor> consumer);
     
     default Element findElement(String string) {
@@ -48,7 +56,18 @@ public interface Context {
     TypeStub[] availableTypes();
     
     default TypeStub findType(String name) {
-        return this.findType(TypeStub.of(name));
+        for (final TypeStub type : this.availableTypes()) {
+            if (type.name().equals(name)) return type;
+        }
+        final TypeStub stub = TypeStub.of(name);
+        this.registerType(stub);
+        return stub;
+    }
+    
+    void registerType(TypeStub type);
+    
+    default TypeStub findType(String name, TypeStub superclass) {
+        return this.findType(TypeStub.of(name, superclass));
     }
     
     default TypeStub findType(TypeStub stub) {
@@ -59,12 +78,6 @@ public interface Context {
         }
         this.registerType(stub);
         return stub;
-    }
-    
-    void registerType(TypeStub type);
-    
-    default TypeStub findType(String name, TypeStub superclass) {
-        return this.findType(TypeStub.of(name, superclass));
     }
     
     default TypeStub findType(String name, TypeStub superclass, TypeStub... interfaces) {

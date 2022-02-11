@@ -4,10 +4,7 @@ import mx.kenzie.remix.builder.FieldBuilder;
 import mx.kenzie.remix.builder.FunctionBuilder;
 import mx.kenzie.remix.builder.TypeBuilder;
 import mx.kenzie.remix.lang.Element;
-import mx.kenzie.remix.meta.FieldStub;
-import mx.kenzie.remix.meta.FunctionStub;
-import mx.kenzie.remix.meta.TypeStub;
-import mx.kenzie.remix.meta.Variable;
+import mx.kenzie.remix.meta.*;
 import mx.kenzie.remix.parser.Flag;
 import org.objectweb.asm.MethodVisitor;
 
@@ -27,11 +24,13 @@ public class CompileContext implements Context {
     protected final List<Element> validElements = new ArrayList<>();
     protected final List<FunctionBuilder> function = new ArrayList<>();
     protected final List<TypeStub> stack = new ArrayList<>();
+    protected final List<BufferEntry> buffer = new ArrayList<>();
     private final TrackerQueue trackers = new TrackerQueue();
     private final List<String> errors = new ArrayList<>();
     private final List<Bookmark> bookmarks = new ArrayList<>();
     protected volatile int maxStack;
     protected volatile int modifier;
+    protected boolean bufferReady;
     private boolean elementsAreValid = false;
     private char upcoming;
     
@@ -64,7 +63,7 @@ public class CompileContext implements Context {
         }
         return true;
     }
-    
+
     @Override
     public boolean hasAnyFlags(Flag... flags) {
         for (final Flag flag : flags) {
@@ -74,8 +73,28 @@ public class CompileContext implements Context {
     }
     
     @Override
+    public void buffer(Consumer<MethodVisitor> consumer, int pop, TypeStub push) {
+        this.buffer.add(new BufferEntry(consumer, pop, push));
+        this.bufferReady = false;
+    }
+    
+    @Override
+    public void emptyBuffer() {
+        if (!bufferReady) return;
+        if (buffer.isEmpty()) return;
+        for (final BufferEntry entry : buffer) {
+            final Consumer<MethodVisitor> action = entry.consumer();
+            this.function.get(0).write(action);
+            if (entry.pop() > 0) this.pop(entry.pop());
+            if (entry.push() != null) this.push(entry.push());
+        }
+        this.buffer.clear();
+    }
+    
+    @Override
     public void write(Consumer<MethodVisitor> consumer) {
         this.function.get(0).write(consumer);
+        this.bufferReady = true;
     }
     
     @Override
@@ -286,10 +305,7 @@ public class CompileContext implements Context {
     public boolean close(Element element, String string) {
         assert !bookmarks.isEmpty();
         final Bookmark bookmark = bookmarks.get(0);
-        if (bookmark.element() != element) {
-            System.out.println(string); // todo
-            return false;
-        }
+        if (bookmark.element() != element) return false;
         element.close(this, string);
         this.bookmarks.remove(0);
         return true;

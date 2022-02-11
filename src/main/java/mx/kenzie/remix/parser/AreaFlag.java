@@ -5,6 +5,7 @@ public enum AreaFlag implements Flag {
     HEADER,
     HEADER_TYPE,
     HEADER_FUNC,
+    HEADER_OPER,
     BODY_TYPE,
     BODY_FUNC,
     BODY_VAR,

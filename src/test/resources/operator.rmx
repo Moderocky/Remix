@@ -1,0 +1,30 @@
+
+
+type thing {
+
+    oper Add string string {
+        exit { "hello " + string }
+    }
+
+    oper Add number number {
+        exit { "there " + number }
+    }
+
+    oper Mul number number {
+        exit { 22 }
+    }
+
+}
+
+
+type intro {
+
+    func Main {
+        thing thing { alloc thing }
+
+        system.Print { thing + "there" }
+        system.Print { thing + 6 }
+        system.Print { thing * 7 }
+    }
+
+}

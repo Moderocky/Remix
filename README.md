@@ -27,10 +27,10 @@ All Remix objects act like Java primitives and can be allocated in a memory-zero
 null-pointer exceptions from ever occurring and allows programs to continue even in an unexpected error state.
 
 ```rmx
-house house:;
-system.Print:
+house house {}
+system.Print {
     house.GetName
-;
+}
 ```
 
 Remix has no global state.
@@ -45,11 +45,16 @@ Inside an instruction area (e.g. a function body) all statements map directly to
 This allows advanced developers to write more efficient code that would be unachievable in other JVM languages.
 
 ```rmx
-system dup.Print: "hello";.Print: "there";
-return:
-    number x: 100;
+system dup.Print { "hello" }.Print {"there" }
+exit {
+    number x { 100 }
     x + 10
-;
+}
+
+if true {
+}
+true if {
+}
 ```
 
 ### 3. Configuration

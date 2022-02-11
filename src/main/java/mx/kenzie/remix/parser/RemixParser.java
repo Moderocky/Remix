@@ -23,6 +23,7 @@ public class RemixParser implements Closeable {
     protected volatile boolean parse;
     protected volatile ParseMode mode;
     protected volatile Context context;
+    private volatile int count;
     
     public RemixParser(InputStream stream, Context context) {
         this(stream);
@@ -59,6 +60,8 @@ public class RemixParser implements Closeable {
                 return;
             }
             case '.' -> this.mode = ParseMode.DOT_WORD;
+            case '+', '-', '*', '/', '=', '!', '?', '&', '|' -> this.mode = ParseMode.SYMBOL;
+            case '<', '>' -> this.mode = ParseMode.SYMBOL_2;
             case '"' -> this.mode = ParseMode.STRING;
         }
         this.context.clearErrors();
@@ -68,15 +71,16 @@ public class RemixParser implements Closeable {
             this.context.setUpcoming(reader.upcoming());
         }
         final Element element = context.findElement(part);
+        this.count++;
         if (element == null) {
             final String[] errors = context.errors();
             if (errors.length == 0)
-                throw new RuntimeException("Parser could not identify '" + part + "'.");
+                throw new RuntimeException("Parser could not identify '" + part + "' (" + count + ").");
             throw new RuntimeException("Parser could not identify '" + part + "'.\nBelow are some suggestions:\n\t"
                 + String.join("\n\t", errors));
         }
         element.write(context, part);
-        System.out.println(part + ": " + element.getClass().getSimpleName()); // todo
+        context.emptyBuffer();
         if (element.hasBody()) this.current(element, part);
         this.mode = element.nextMode(mode);
     }

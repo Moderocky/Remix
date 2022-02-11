@@ -28,22 +28,22 @@ public class KeywordIf implements Keyword, Element {
     
     @Override
     public void open(Context context, String string) {
-        context.openTracker();
         final TypeStub stub = context.pop();
         assert stub.canCastTo(TypeStub.of(rmx.object.class));
         final FunctionStub function = TypeStub.of(rmx.object.class).getMethod("booleanValue");
         context.write(function.write());
         final Label label = context.bookmark().end();
         context.write(visitor -> visitor.visitJumpInsn(153, label));
+        context.openTracker();
         context.addFlags(AreaFlag.BODY_IF);
     }
     
     @Override
     public void close(Context context, String string) {
         context.removeFlags(AreaFlag.BODY_IF);
+        final int index = context.closeTracker();
         final Label label = context.bookmark().end();
         context.write(visitor -> visitor.visitLabel(label));
-        final int index = context.closeTracker();
         if (index != 0) context.fail("Unbalanced stack in if-branch.");
     }
 }

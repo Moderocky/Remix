@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class FunctionStub {
+    
     private final int modifiers;
     private final TypeStub owner;
     private final String name;
@@ -88,19 +89,17 @@ public final class FunctionStub {
         return parameters;
     }
     
-    public FunctionStub setResult(TypeStub result) {
+    public void setResult(TypeStub result) {
         this.result = result;
-        return this;
     }
     
-    public FunctionStub setParameters(TypeStub[] parameters) {
+    public void setParameters(TypeStub[] parameters) {
         this.parameters = parameters;
-        return this;
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(modifiers, owner, result, name, parameters);
+        return Objects.hash(modifiers, owner, result, name, Arrays.hashCode(parameters));
     }
     
     @Override
@@ -108,11 +107,10 @@ public final class FunctionStub {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (FunctionStub) obj;
-        return this.modifiers == that.modifiers &&
-            Objects.equals(this.owner, that.owner) &&
+        return
             Objects.equals(this.result, that.result) &&
-            Objects.equals(this.name, that.name) &&
-            Objects.equals(this.parameters, that.parameters);
+                Objects.equals(this.name, that.name) &&
+                Arrays.equals(this.parameters, that.parameters);
     }
     
     @Override
@@ -122,7 +120,8 @@ public final class FunctionStub {
             "owner=" + owner + ", " +
             "result=" + result + ", " +
             "name=" + name + ", " +
-            "parameters=" + parameters + ']';
+            "parameters=" + Arrays.toString(parameters) + ", " +
+            "hash=" + System.identityHashCode(this) + ", " + ']';
     }
     
     

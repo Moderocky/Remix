@@ -1,0 +1,12 @@
+
+type zero {
+
+    func Main {
+        string string {}
+        if true {
+            exit { string }
+        }
+        exit { "hello" }
+    }
+
+}

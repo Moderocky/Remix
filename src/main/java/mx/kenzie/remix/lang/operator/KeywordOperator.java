@@ -1,4 +1,4 @@
-package mx.kenzie.remix.lang.function;
+package mx.kenzie.remix.lang.operator;
 
 import mx.kenzie.remix.compiler.Context;
 import mx.kenzie.remix.lang.Element;
@@ -6,7 +6,9 @@ import mx.kenzie.remix.lang.Keyword;
 import mx.kenzie.remix.parser.AreaFlag;
 import mx.kenzie.remix.parser.ConsumerFlag;
 
-public class KeywordFunction implements Keyword, Element {
+import java.lang.reflect.Modifier;
+
+public class KeywordOperator implements Keyword, Element {
     
     @Override
     public boolean isValid(Context context) {
@@ -16,7 +18,7 @@ public class KeywordFunction implements Keyword, Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        return string.equals("func") && context.check() == null;
+        return string.equals("oper") && context.check() == null;
     }
     
     @Override
@@ -31,18 +33,18 @@ public class KeywordFunction implements Keyword, Element {
     
     @Override
     public void write(Context context, String string) {
-        context.addFlags(AreaFlag.HEADER_FUNC);
-        context.addFlags(ConsumerFlag.HEADER_FUNC_NAME);
+        context.addFlags(AreaFlag.HEADER_OPER);
+        context.addFlags(ConsumerFlag.HEADER_OPER_NAME);
+        context.prepareModifier(Modifier.SYNCHRONIZED);
     }
     
     @Override
     public void open(Context context, String string) {
-        if (context.hasAnyFlags(ConsumerFlag.HEADER_FUNC_NAME))
-            context.error("Function was given no name.");
-        // maybe functional interface members have no name?
-        if (context.hasAnyFlags(ConsumerFlag.HEADER_FUNC_PARAM_NAME))
-            context.error("Function has trailing parameter type.");
-        context.removeFlags(AreaFlag.HEADER_FUNC, ConsumerFlag.HEADER_FUNC_PARAM_TYPE);
+        if (context.hasAnyFlags(ConsumerFlag.HEADER_OPER_NAME))
+            context.error("Operator was given no name.");
+        if (context.hasAnyFlags(ConsumerFlag.HEADER_OPER_PARAM_NAME))
+            context.error("Operator has trailing parameter type.");
+        context.removeFlags(AreaFlag.HEADER_OPER, ConsumerFlag.HEADER_OPER_PARAM_TYPE);
         context.addFlags(AreaFlag.BODY_FUNC, AreaFlag.INSTRUCTION_AREA);
     }
     

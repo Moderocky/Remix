@@ -9,9 +9,15 @@ import mx.kenzie.remix.lang.function.FunctionName;
 import mx.kenzie.remix.lang.function.FunctionParameter;
 import mx.kenzie.remix.lang.function.FunctionParameterName;
 import mx.kenzie.remix.lang.function.KeywordFunction;
+import mx.kenzie.remix.lang.literal.LiteralBoolean;
 import mx.kenzie.remix.lang.literal.LiteralDecimal;
 import mx.kenzie.remix.lang.literal.LiteralInteger;
 import mx.kenzie.remix.lang.literal.LiteralString;
+import mx.kenzie.remix.lang.operator.KeywordOperator;
+import mx.kenzie.remix.lang.operator.OperatorName;
+import mx.kenzie.remix.lang.operator.OperatorParameter;
+import mx.kenzie.remix.lang.operator.OperatorParameterName;
+import mx.kenzie.remix.lang.symbol.*;
 import mx.kenzie.remix.lang.type.KeywordExtends;
 import mx.kenzie.remix.lang.type.KeywordType;
 import mx.kenzie.remix.lang.type.TypeExtends;
@@ -39,6 +45,11 @@ public abstract class RemixTest {
             new KeywordExtends(),
             new TypeExtends(),
             
+            new KeywordOperator(),
+            new OperatorName(),
+            new OperatorParameter(),
+            new OperatorParameterName(),
+            
             new KeywordFunction(),
             new FunctionName(),
             new FunctionParameter(),
@@ -48,6 +59,19 @@ public abstract class RemixTest {
             new TypeField(),
             new NameField(),
             
+            new SymbolAdd(),
+            new SymbolSubtract(),
+            new SymbolMultiply(),
+            new SymbolDivide(),
+            new SymbolPush(),
+            new SymbolPull(),
+            new SymbolEquals(),
+            new SymbolAnd(),
+            new SymbolOr(),
+            new SymbolBool(),
+            new SymbolNeg(),
+            
+            new KeywordIf(),
             new KeywordDuplicate(),
             new KeywordPop(),
             new KeywordSwap(),
@@ -58,6 +82,8 @@ public abstract class RemixTest {
             new TypeNew(),
             new KeywordCast(),
             new TypeCast(),
+            new KeywordInstance(),
+            new TypeInstance(),
             
             new ConstantThis(),
             new ConstantSystem(),
@@ -69,6 +95,7 @@ public abstract class RemixTest {
             new LiteralString(),
             new LiteralInteger(),
             new LiteralDecimal(),
+            new LiteralBoolean(),
             
             new VariableUse(),
             new VariableType(),

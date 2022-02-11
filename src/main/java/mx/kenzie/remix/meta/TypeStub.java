@@ -14,6 +14,11 @@ import java.util.function.Consumer;
 
 public class TypeStub implements java.lang.reflect.Type {
     
+    public static final TypeStub OBJECT = TypeStub.of(rmx.object.class),
+        INTEGER = TypeStub.of(rmx.integer.class),
+        STRING = TypeStub.of(rmx.string.class),
+        SYSTEM = TypeStub.of(rmx.system.class);
+    
     protected final HashSet<FunctionStub> methods;
     protected final HashSet<FieldStub> fields;
     protected String name;
@@ -286,12 +291,12 @@ public class TypeStub implements java.lang.reflect.Type {
     public TypeStub common(TypeStub stub) {
         if (stub.primitive) return this;
         if (this.equals(stub)) return this;
-        if (this.array() && stub.array()) return TypeStub.of(Object[].class);
         {
             final List<TypeStub> ours, theirs;
             ours = this.allSuperclasses();
             theirs = stub.allSuperclasses();
             for (final TypeStub our : ours) {
+                if (our == null) continue;
                 if (theirs.contains(our)) return our;
             }
         }
@@ -302,10 +307,11 @@ public class TypeStub implements java.lang.reflect.Type {
             ours.addAll(this.allInterfaces());
             theirs.addAll(stub.allInterfaces());
             for (final TypeStub our : ours) {
+                if (our == null) continue;
                 if (theirs.contains(our)) return our;
             }
         }
-        return TypeStub.of(rmx.object.class);
+        return TypeStub.OBJECT;
     }
     
     public List<TypeStub> allSuperclasses() {

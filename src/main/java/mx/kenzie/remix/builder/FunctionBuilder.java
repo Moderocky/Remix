@@ -16,11 +16,16 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     protected final FunctionStub stub;
     protected boolean returnSet;
     protected volatile TypeStub prepared;
+    protected boolean operator;
     
     public FunctionBuilder(int modifiers, TypeStub owner, String name) {
         this.stub = new FunctionStub(modifiers, owner, TypeStub.of(void.class), name);
         this.variables = new ArrayList<>();
         this.instructions = new ArrayList<>();
+    }
+    
+    public void setOperator(boolean operator) {
+        this.operator = operator;
     }
     
     public Variable getVariable(String name) {
@@ -74,6 +79,7 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     }
     
     public TypeStub setReturnType(TypeStub result) {
+        assert result != null;
         if (!returnSet) {
             this.forceReturnType(result);
             this.returnSet = true;

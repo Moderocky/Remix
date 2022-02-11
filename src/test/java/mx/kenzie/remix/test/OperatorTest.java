@@ -10,27 +10,26 @@ import rmx.system;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-public class ZeroInstanceTest extends RemixTest {
+public class OperatorTest extends RemixTest {
     
     private static Class<?> loaded;
     
     @BeforeClass
     public static void start() throws Throwable {
         final CompileContext context = context();
-        final InputStream stream = resource("zero.rmx");
+        final InputStream stream = resource("operator.rmx");
         final RemixParser parser = new RemixParser(stream, context);
         parser.parse();
         final RemixCompiler compiler = new RemixCompiler(context);
 //        compiler.compileAll(new File("blob/"));
         final Class<?>[] classes = compiler.loadAll();
-        loaded = classes[0];
+        loaded = classes[1];
     }
     
     @Test
     public void testMain() throws Throwable {
         final Method method = loaded.getMethod("Main");
-        final rmx.string string = (rmx.string) method.invoke(system.system().Allocate(loaded));
-        System.out.println(string.value());
-        assert string.value().equals("");
+        method.invoke(system.system().Allocate(loaded));
+        
     }
 }

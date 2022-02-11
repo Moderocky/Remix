@@ -2,9 +2,15 @@ package rmx;
 
 public class error extends Throwable implements object {
     
-    public final String message;
+    public final string message;
     
     public error(String message) {
+        super(message);
+        this.message = new string(message);
+    }
+    
+    public error(string message) {
+        super(message.value());
         this.message = message;
     }
     

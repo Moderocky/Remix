@@ -8,7 +8,7 @@ import mx.kenzie.remix.parser.AreaFlag;
 public class LiteralInteger implements Literal<rmx.integer> {
     @Override
     public boolean isValid(Context context) {
-        return context.hasAnyFlags(AreaFlag.LOAD_VALUE, AreaFlag.LOAD_CONSTANT);
+        return context.hasAnyFlags(AreaFlag.INSTRUCTION_AREA);
     }
     
     @Override
