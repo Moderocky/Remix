@@ -93,6 +93,10 @@ public interface Context {
     
     void error(String message);
     
+    default void fail(String message) {
+        throw new RuntimeException("Compile error: " + message);
+    }
+    
     void clearErrors();
     
     String[] errors();
@@ -106,6 +110,8 @@ public interface Context {
     TypeStub check();
     
     void push(TypeStub stub);
+    
+    void incrementTracker();
     
     void prepareModifier(int modifier);
     
@@ -122,4 +128,10 @@ public interface Context {
     void openTracker();
     
     int closeTracker();
+    
+    void open(Element element, String s);
+    
+    boolean close(Element element, String string);
+    
+    Bookmark bookmark();
 }

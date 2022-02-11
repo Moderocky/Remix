@@ -132,7 +132,8 @@ public class TypeStub implements java.lang.reflect.Type {
     }
     
     public String name() {
-        return name;
+        final int index = name.lastIndexOf('/');
+        return name.substring(index + 1);
     }
     
     public TypeStub setName(String name) {
@@ -213,6 +214,15 @@ public class TypeStub implements java.lang.reflect.Type {
         };
     }
     
+    public Consumer<MethodVisitor> zeroInstance() {
+        return visitor -> {
+            visitor.visitMethodInsn(184, "rmx/system", "system", "()Lrmx/system;", false);
+            visitor.visitLdcInsn(Type.getObjectType(this.internal()));
+            visitor.visitMethodInsn(182, "rmx/system", "Allocate", "(Ljava/lang/Class;)Lrmx/object;", false);
+            visitor.visitTypeInsn(192, this.internal());
+        };
+    }
+    
     public FunctionStub[] getMethods(String name) {
         final List<FunctionStub> list = new ArrayList<>();
         for (final FunctionStub method : methods) {
@@ -274,6 +284,7 @@ public class TypeStub implements java.lang.reflect.Type {
     }
     
     public TypeStub common(TypeStub stub) {
+        if (stub.primitive) return this;
         if (this.equals(stub)) return this;
         if (this.array() && stub.array()) return TypeStub.of(Object[].class);
         {
@@ -294,7 +305,7 @@ public class TypeStub implements java.lang.reflect.Type {
                 if (theirs.contains(our)) return our;
             }
         }
-        return TypeStub.of(Object.class);
+        return TypeStub.of(rmx.object.class);
     }
     
     public List<TypeStub> allSuperclasses() {

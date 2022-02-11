@@ -8,5 +8,6 @@ public enum ConsumerFlag implements Flag {
     HEADER_FUNC_PARAM_NAME,
     CAST,
     ALLOCATE,
-    NEW
+    NEW,
+    HEADER_VAR_NAME,
 }

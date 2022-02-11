@@ -8,7 +8,8 @@ A lightweight JVM language designed for frameworks and small-scale serverside ap
 ## Description
 
 RMX (Remix) is a JVM language, but is designed to have minimal interaction with other JVM languages or resources.
-It is designed for writing command-line or background programs that handle data. As a JVM language, Remix programs can be deployed on any Java-supporting machine or operating system and can be run through Java's packaging tools.
+It is designed for writing command-line or background programs that handle data. As a JVM language, Remix programs can
+be deployed on any Java-supporting machine or operating system and can be run through Java's packaging tools.
 
 ## Core Features
 
@@ -18,10 +19,13 @@ This is not an exhaustive list.
 ### 1. Safety
 
 Unlike in other languages, errors are not failure conditions for a Remix program.
-The program is designed to continue past an undetected error where possible, although programs can opt to halt at critical error points.
+The program is designed to continue past an undetected error where possible, although programs can opt to halt at
+critical error points.
 
 Remix does not feature a `null` empty value.
-All Remix objects act like Java primitives and can be allocated in a memory-zero 'default' state. This prevents null-pointer exceptions from ever occurring and allows programs to continue even in an unexpected error state.
+All Remix objects act like Java primitives and can be allocated in a memory-zero 'default' state. This prevents
+null-pointer exceptions from ever occurring and allows programs to continue even in an unexpected error state.
+
 ```rmx
 house house:;
 system.Print:
@@ -30,7 +34,8 @@ system.Print:
 ```
 
 Remix has no global state.
-There is no equivalent for the `static` modifier in Remix. All runnable code exists in objects, which removes a common cause for memory leaks and allows more adaptable design.
+There is no equivalent for the `static` modifier in Remix. All runnable code exists in objects, which removes a common
+cause for memory leaks and allows more adaptable design.
 
 ### 2. Fluidity
 
@@ -68,14 +73,16 @@ Binary operators can have multiple overloaded versions for specific arguments.
 
 ### 4. Storage
 
-RMX programs are designed to be easy to store and load. All objects can be converted to a binary format for easy saving and resuming of a program state.
+RMX programs are designed to be easy to store and load. All objects can be converted to a binary format for easy saving
+and resuming of a program state.
 This is useful for applications that need to recover data and resume their progress once restarted.
 
 ### 5. Power
 
 Developers have access to low-level tools that are inaccessible in other JVM languages.
 
-These are designed to allow advanced developers to write more efficient code by reducing the need for variable assignments, repeat evaluation, etc. 
+These are designed to allow advanced developers to write more efficient code by reducing the need for variable
+assignments, repeat evaluation, etc.
 
 At the compiler stage:
 
@@ -84,7 +91,6 @@ At the compiler stage:
 | Duplicate | Copy the previous stack value. (Useful for duplicating arguments.)             | `dup`           |
 | Pop       | Discard the previous stack value. (Useful for discarding unwanted results.)    | `pop`           |
 | Swap      | Swap the order of the previous two values. (Useful for re-ordering arguments.) | `swap`          |
-
 
 At the virtual machine stage:
 
@@ -99,7 +105,8 @@ At the virtual machine stage:
 
 A list of control keywords available in the language.
 RMX keywords are not reserved words, but will always take preference over other usages in valid situations.
-For example, the first `house` usage in `this house house: ;` would be identified as a type (for a variable assignment) but if it were replaced with `cast` (see `this cast house:;`) then the `cast` keyword would take priority.
+For example, the first `house` usage in `this house house: ;` would be identified as a type (for a variable assignment)
+but if it were replaced with `cast` (see `this cast house:;`) then the `cast` keyword would take priority.
 
 | Keyword | Description                                              |
 |---------|----------------------------------------------------------|

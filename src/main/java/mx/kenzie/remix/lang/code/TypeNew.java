@@ -9,6 +9,12 @@ import mx.kenzie.remix.parser.ConsumerFlag;
 public class TypeNew implements Singleton, Element {
     
     @Override
+    public boolean matches(Context context, String string) {
+        if (!context.hasType(string)) return false;
+        return Singleton.super.matches(context, string);
+    }
+    
+    @Override
     public void writeSingle(Context context, String string) {
         final TypeStub stub = context.findType(string);
         context.push(stub);

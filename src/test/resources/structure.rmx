@@ -1,0 +1,26 @@
+
+type building {
+
+}
+
+type house is building {
+
+    object thing
+    trans object blob
+
+    func TestFunc {
+        exit { "hello" }
+    }
+
+    func MyFunc string name {
+        system.Print { name }
+        exit { name }
+    }
+
+    func Test {
+        exit {
+            this.MyFunc { "hello there" }
+        }
+    }
+
+}

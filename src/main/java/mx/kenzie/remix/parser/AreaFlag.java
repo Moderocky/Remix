@@ -11,7 +11,8 @@ public enum AreaFlag implements Flag {
     LOAD_CONSTANT,
     LOAD_VALUE,
     THIS_AVAILABLE,
-    RETURN,
+    BODY_EXIT,
+    BODY_IF,
     INSTRUCTION_AREA,
     
 }

@@ -26,14 +26,20 @@ public class KeywordExit implements Keyword, Element {
     
     @Override
     public void open(Context context, String string) {
-        context.addFlags(AreaFlag.RETURN, AreaFlag.LOAD_VALUE);
+        context.addFlags(AreaFlag.BODY_EXIT, AreaFlag.LOAD_VALUE);
+        context.openTracker();
     }
     
     @Override
     public void close(Context context, String string) {
-        context.removeFlags(AreaFlag.RETURN, AreaFlag.LOAD_VALUE);
-        final TypeStub stub = context.pop();
-        final int offset = context.currentFunction().setReturnType(stub).offset();
+        context.removeFlags(AreaFlag.BODY_EXIT, AreaFlag.LOAD_VALUE);
+        final int amount = context.closeTracker();
+        final TypeStub stub;
+        if (amount == 0) stub = TypeStub.of(void.class);
+        else stub = context.pop();
+        final TypeStub result = context.currentFunction().setReturnType(stub);
+        final int offset = result.offset();
+        if (amount == 0 && offset != 6) context.write(result.zeroInstance());
         context.write(visitor -> visitor.visitInsn(171 + offset));
     }
 }

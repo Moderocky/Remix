@@ -1,6 +1,9 @@
 package mx.kenzie.remix.meta;
 
 import mx.kenzie.remix.compiler.Context;
+import org.objectweb.asm.MethodVisitor;
+
+import java.util.function.Consumer;
 
 public interface Variable {
     
@@ -20,8 +23,18 @@ public interface Variable {
     
     TypeStub type();
     
+    default Consumer<MethodVisitor> store(Context context) {
+        final int slot = this.slot(context);
+        return visitor -> visitor.visitVarInsn(58, slot);
+    }
+    
     default int slot(Context context) {
         return context.slot(this);
+    }
+    
+    default Consumer<MethodVisitor> load(Context context) {
+        final int slot = this.slot(context);
+        return visitor -> visitor.visitVarInsn(25, slot);
     }
     
 }

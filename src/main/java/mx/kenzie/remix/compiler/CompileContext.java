@@ -29,6 +29,7 @@ public class CompileContext implements Context {
     protected final List<TypeStub> stack = new ArrayList<>();
     private final TrackerQueue trackers = new TrackerQueue();
     private final List<String> errors = new ArrayList<>();
+    private final List<Bookmark> bookmarks = new ArrayList<>();
     protected volatile int maxStack;
     protected volatile int modifier;
     private boolean elementsAreValid = false;
@@ -177,7 +178,7 @@ public class CompileContext implements Context {
     
     @Override
     public int slot(Variable variable) {
-        return 0;
+        return this.currentFunction().slot(variable);
     }
     
     @Override
@@ -192,7 +193,7 @@ public class CompileContext implements Context {
         if (stack.isEmpty()) return new TypeStub[amount];
         final List<TypeStub> stubs = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
-            stubs.add(stack.remove(0));
+            stubs.add(0, stack.remove(0));
         }
         this.trackers.count(amount * -1);
         return stubs.toArray(new TypeStub[0]);
@@ -210,6 +211,11 @@ public class CompileContext implements Context {
         this.stack.add(0, stub);
         this.trackers.count(1);
         if (maxStack < stack.size()) maxStack = stack.size();
+    }
+    
+    @Override
+    public void incrementTracker() {
+        this.trackers.count(1);
     }
     
     @Override
@@ -270,6 +276,30 @@ public class CompileContext implements Context {
         return trackers.close();
     }
     
+    @Override
+    public void open(Element element, String string) {
+        this.bookmarks.add(0, new Bookmark(element));
+        element.open(this, string);
+    }
+    
+    @Override
+    public boolean close(Element element, String string) {
+        assert !bookmarks.isEmpty();
+        final Bookmark bookmark = bookmarks.get(0);
+        if (bookmark.element() != element) {
+            System.out.println(string); // todo
+            return false;
+        }
+        element.close(this, string);
+        this.bookmarks.remove(0);
+        return true;
+    }
+    
+    @Override
+    public Bookmark bookmark() {
+        return bookmarks.get(0);
+    }
+    
     private FunctionStub findLocalFunction(String name) {
         for (final FunctionStub function : this.functions) {
             if (!function.name().equals(name)) continue;
@@ -277,4 +307,5 @@ public class CompileContext implements Context {
         }
         return null;
     }
+    
 }

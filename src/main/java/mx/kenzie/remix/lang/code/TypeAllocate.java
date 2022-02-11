@@ -9,17 +9,16 @@ import mx.kenzie.remix.parser.ConsumerFlag;
 public class TypeAllocate implements Singleton, Element {
     
     @Override
+    public boolean matches(Context context, String string) {
+        if (!context.hasType(string)) return false;
+        return Singleton.super.matches(context, string);
+    }
+    
+    @Override
     public void writeSingle(Context context, String string) {
         final TypeStub stub = context.findType(string);
-        final TypeStub system = TypeStub.of(rmx.system.class);
         context.push(stub);
-        if (stub.primitive()) {
-            context.write(visitor -> visitor.visitIntInsn(16, 0));
-            return;
-        }
-        context.write(system.newInstance());
-        context.write(stub.typeLiteral());
-        context.write(system.getMethod("Allocate", TypeStub.of(Class.class)).write());
+        context.write(stub.zeroInstance());
     }
     
     @Override

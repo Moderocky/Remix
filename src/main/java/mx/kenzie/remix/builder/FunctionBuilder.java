@@ -15,6 +15,7 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     protected final List<Consumer<MethodVisitor>> instructions;
     protected final FunctionStub stub;
     protected boolean returnSet;
+    protected volatile TypeStub prepared;
     
     public FunctionBuilder(int modifiers, TypeStub owner, String name) {
         this.stub = new FunctionStub(modifiers, owner, TypeStub.of(void.class), name);
@@ -24,16 +25,16 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     
     public Variable getVariable(String name) {
         for (final Variable variable : variables) {
-            if (variable.name().equals(name)) return variable;
+            if (name.equals(variable.name())) return variable;
         }
         return null;
     }
     
-    public Variable getOrCreateVariable(String name) {
+    public Variable getOrCreateVariable(String name, TypeStub type) {
         for (final Variable variable : variables) {
-            if (variable.name().equals(name)) return variable;
+            if (name.equals(variable.name()) && type.equals(variable.type())) return variable;
         }
-        final Variable variable = Variable.create(name, TypeStub.of(Object.class));
+        final Variable variable = Variable.create(name, type);
         this.variables.add(variable);
         return variable;
     }
@@ -45,6 +46,23 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     
     public void insertVariable(Variable variable) {
         this.variables.add(variable);
+    }
+    
+    public boolean hasVariable(String name) {
+        for (final Variable variable : variables) {
+            if (name.equals(variable.name())) return true;
+        }
+        return false;
+    }
+    
+    public synchronized void prepareVariable(TypeStub stub) {
+        this.prepared = stub;
+    }
+    
+    public TypeStub getPrepared() {
+        final TypeStub stub = this.prepared;
+        this.prepared = null;
+        return stub;
     }
     
     public int slot(Variable variable) {

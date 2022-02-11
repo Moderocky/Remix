@@ -54,6 +54,14 @@ public class system extends PrintStream implements InternalAccess.AccessUnsafe, 
                 this.unsafe.putObject(thing, offset, unsafe.allocateInstance(field.getType()));
             else this.unsafe.putObject(thing, offset, this.Allocate(field.getType()));
         }
+        for (final Field field : type.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) continue;
+            if (field.getType().isPrimitive()) continue;
+            final long offset = unsafe.objectFieldOffset(field);
+            if (!object.class.isAssignableFrom(field.getType()))
+                this.unsafe.putObject(thing, offset, field.getType().getConstructor().newInstance());
+            else this.unsafe.putObject(thing, offset, this.Allocate(field.getType()));
+        }
         return thing;
     }
     

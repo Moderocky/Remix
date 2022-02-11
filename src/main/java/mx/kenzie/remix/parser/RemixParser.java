@@ -14,7 +14,7 @@ import java.util.List;
 
 public class RemixParser implements Closeable {
     
-    public static final char DOWN = ':', UP = ';';
+    public static final char DOWN = '{', UP = '}';
     
     protected final InputStreamController stream;
     protected final StreamReader reader;
@@ -54,7 +54,7 @@ public class RemixParser implements Closeable {
                 return;
             }
             case UP -> {
-                this.closeElement(); // todo needs to change
+                this.closeElement();
                 this.reader.skip();
                 return;
             }
@@ -76,18 +76,22 @@ public class RemixParser implements Closeable {
                 + String.join("\n\t", errors));
         }
         element.write(context, part);
+        System.out.println(part + ": " + element.getClass().getSimpleName()); // todo
         if (element.hasBody()) this.current(element, part);
         this.mode = element.nextMode(mode);
     }
     
     protected void openElement() {
         final Element element = current.get(0);
-        element.open(context, stubs.get(0));
+        this.context.open(element, stubs.get(0));
     }
     
     protected void closeElement() {
-        final Element element = this.current.remove(0);
-        element.close(context, stubs.remove(0));
+        boolean result;
+        do {
+            final Element element = this.current.remove(0);
+            result = this.context.close(element, stubs.remove(0));
+        } while (!result && !this.current.isEmpty());
     }
     
     protected void current(Element element, String stub) {
