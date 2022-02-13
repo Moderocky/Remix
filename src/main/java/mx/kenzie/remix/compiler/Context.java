@@ -4,6 +4,7 @@ import mx.kenzie.remix.builder.FieldBuilder;
 import mx.kenzie.remix.builder.FunctionBuilder;
 import mx.kenzie.remix.builder.TypeBuilder;
 import mx.kenzie.remix.lang.Element;
+import mx.kenzie.remix.meta.FieldStub;
 import mx.kenzie.remix.meta.FunctionStub;
 import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.meta.Variable;
@@ -138,6 +139,8 @@ public interface Context {
     
     FunctionStub findFunction(String name, TypeStub... parameters);
     
+    FieldStub findField(String name);
+    
     void openTracker();
     
     int closeTracker();
@@ -147,4 +150,6 @@ public interface Context {
     boolean close(Element element, String string);
     
     Bookmark bookmark();
+    
+    void closeFields();
 }

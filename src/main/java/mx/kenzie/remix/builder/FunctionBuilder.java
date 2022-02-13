@@ -14,14 +14,15 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     protected final List<Variable> variables;
     protected final List<Consumer<MethodVisitor>> instructions;
     protected final FunctionStub stub;
+    protected final List<TypeStub> prepared;
     protected boolean returnSet;
-    protected volatile TypeStub prepared;
     protected boolean operator;
     
     public FunctionBuilder(int modifiers, TypeStub owner, String name) {
         this.stub = new FunctionStub(modifiers, owner, TypeStub.of(void.class), name);
         this.variables = new ArrayList<>();
         this.instructions = new ArrayList<>();
+        this.prepared = new ArrayList<>();
     }
     
     public void setOperator(boolean operator) {
@@ -61,13 +62,11 @@ public class FunctionBuilder implements Builder, Consumer<MethodVisitor> {
     }
     
     public synchronized void prepareVariable(TypeStub stub) {
-        this.prepared = stub;
+        this.prepared.add(0, stub);
     }
     
     public TypeStub getPrepared() {
-        final TypeStub stub = this.prepared;
-        this.prepared = null;
-        return stub;
+        return this.prepared.remove(0);
     }
     
     public int slot(Variable variable) {

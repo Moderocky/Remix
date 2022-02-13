@@ -43,6 +43,10 @@ public class RemixParser implements Closeable {
         while (parse && !reader.isEmpty()) {
             this.step();
         }
+        while (!this.current.isEmpty()) {
+            this.openElement();
+            this.closeElement();
+        }
     }
     
     public synchronized void step() throws IOException {
@@ -60,6 +64,7 @@ public class RemixParser implements Closeable {
                 return;
             }
             case '.' -> this.mode = ParseMode.DOT_WORD;
+            case '$' -> this.mode = ParseMode.DOLLAR_WORD;
             case '+', '-', '*', '/', '=', '!', '?', '&', '|' -> this.mode = ParseMode.SYMBOL;
             case '<', '>' -> this.mode = ParseMode.SYMBOL_2;
             case '"' -> this.mode = ParseMode.STRING;

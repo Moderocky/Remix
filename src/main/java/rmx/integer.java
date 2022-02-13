@@ -64,6 +64,16 @@ public class integer extends number {
     }
     
     @Override
+    public object And(object object) {
+        return new integer(value & object.booleanValue());
+    }
+    
+    @Override
+    public object Or(object object) {
+        return new integer(value | object.booleanValue());
+    }
+    
+    @Override
     public String toString() {
         return value + "";
     }

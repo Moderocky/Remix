@@ -1,0 +1,41 @@
+
+type bean {
+    trans number thing
+}
+
+
+type blob {
+    trans number age
+    trans string name
+
+    func GetName {
+        exit { this.name {}  }
+    }
+
+    func SetName string name {
+        this.name { name }
+    }
+
+    func Main {
+        this$name { "hello" }
+        if this$name {} =! "hello" {
+            system.Error {"field value set failed"}
+        }
+        this.name {"goodbye"}
+        if this.name {} = "hello" {
+            system.Error {"field value set failed"}
+        }
+        if this.name {} =! "goodbye" {
+            system.Error {"field value set failed"}
+        }
+
+        this.SetName this.SetName {"hello"} {"there"}
+
+        bean thing { alloc bean }
+        thing.thing { 5 }
+        thing$thing { 10 }
+        system.Print { thing$thing{} }
+
+    }
+
+}

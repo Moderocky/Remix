@@ -21,7 +21,7 @@ public class TypeBuilder implements Builder {
         PULL = new FunctionStub(0, TypeStub.OBJECT, TypeStub.OBJECT, "Pull", TypeStub.OBJECT),
         AND = new FunctionStub(0, TypeStub.OBJECT, TypeStub.OBJECT, "And", TypeStub.OBJECT),
         OR = new FunctionStub(0, TypeStub.OBJECT, TypeStub.OBJECT, "Or", TypeStub.OBJECT),
-        BOOL = new FunctionStub(0, TypeStub.OBJECT, TypeStub.INTEGER, "Or"),
+        BOOL = new FunctionStub(0, TypeStub.OBJECT, TypeStub.INTEGER, "Bool"),
         NEG = new FunctionStub(0, TypeStub.OBJECT, TypeStub.INTEGER, "Neg");
     protected final List<FunctionBuilder> functions = new ArrayList<>();
     protected final List<FieldBuilder> fields = new ArrayList<>();
@@ -153,5 +153,11 @@ public class TypeBuilder implements Builder {
         this.functions.add(builder);
         this.stub.addMethod(builder.stub);
         return builder;
+    }
+    
+    public void closeFields() {
+        for (final FieldBuilder field : this.fields) {
+        
+        }
     }
 }

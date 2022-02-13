@@ -15,7 +15,21 @@ public enum ParseMode {
     DOT_WORD {
         @Override
         public String read(StreamReader reader) throws IOException {
-            return (char) reader.read() + reader.readWord();
+            final StringBuilder builder = new StringBuilder();
+            builder.append((char) reader.read());
+            reader.readWhitespace();
+            builder.append(reader.readWord());
+            return builder.toString();
+        }
+    },
+    DOLLAR_WORD {
+        @Override
+        public String read(StreamReader reader) throws IOException {
+            final StringBuilder builder = new StringBuilder();
+            builder.append((char) reader.read());
+            reader.readWhitespace();
+            builder.append(reader.readWord());
+            return builder.toString();
         }
     },
     SYMBOL {

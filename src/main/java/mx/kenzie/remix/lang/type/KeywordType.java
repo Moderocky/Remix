@@ -48,6 +48,7 @@ public class KeywordType implements Keyword, Element {
     @Override
     public void close(Context context, String string) {
         context.removeFlags(AreaFlag.BODY_TYPE);
+        context.closeFields();
         context.currentType().bakeOperators();
         context.endType();
     }

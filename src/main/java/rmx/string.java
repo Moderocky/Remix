@@ -46,6 +46,18 @@ public class string implements object {
     }
     
     @Override
+    public integer Equals(object object) {
+        if (object instanceof string string)
+            return this.Equals(string);
+        return object.super.Equals(object);
+    }
+    
+    public integer Equals(string object) {
+        if (value.equals(object.value)) return integer.ONE;
+        return integer.ZERO;
+    }
+    
+    @Override
     public int hashCode() {
         return super.hashCode();
     }

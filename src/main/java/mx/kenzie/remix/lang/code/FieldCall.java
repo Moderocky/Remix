@@ -2,12 +2,12 @@ package mx.kenzie.remix.lang.code;
 
 import mx.kenzie.remix.compiler.Context;
 import mx.kenzie.remix.lang.Element;
-import mx.kenzie.remix.meta.FunctionStub;
+import mx.kenzie.remix.meta.FieldStub;
 import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.parser.AreaFlag;
 import mx.kenzie.remix.parser.ParseMode;
 
-public class FunctionCall implements Element {
+public class FieldCall implements Element {
     
     @Override
     public boolean isValid(Context context) {
@@ -16,9 +16,13 @@ public class FunctionCall implements Element {
     
     @Override
     public boolean matches(Context context, String string) {
-        if (!string.startsWith(".")) return false;
+        if (!string.startsWith("$")) return false;
         if (context.check() == null) {
-            context.error("Function calls require a preceding value to call from.");
+            context.error("Field calls require a preceding value to call from.");
+            return false;
+        }
+        if (context.findField(string.substring(1).trim()) == null) {
+            context.error("No local field for '" + string + "' was found.");
             return false;
         }
         return true;
@@ -36,7 +40,6 @@ public class FunctionCall implements Element {
     
     @Override
     public void write(Context context, String string) {
-        final String name = string.substring(1).trim();
     }
     
     @Override
@@ -49,11 +52,14 @@ public class FunctionCall implements Element {
         final String name = string.substring(1).trim();
         final int amount = context.closeTracker();
         final TypeStub[] arguments = context.pop(amount);
-        final FunctionStub function = context.findFunction(name, arguments);
-        if (function == null) context.fail("Unmatched function '" + name + "' from " + context.check().name());
+        final FieldStub field = context.findField(name);
         context.pop(); // owner
-        context.write(function.write());
-        context.push(function.result());
+        if (arguments.length == 0) {
+            context.write(field.get());
+            context.push(field.type());
+        } else {
+            context.write(field.set());
+        }
     }
     
 }

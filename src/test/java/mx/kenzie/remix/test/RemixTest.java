@@ -89,7 +89,7 @@ public abstract class RemixTest {
             new ConstantSystem(),
             new ConstantTop(),
             
-            new FunctionGet(),
+            new FieldCall(),
             new FunctionCall(),
             
             new LiteralString(),

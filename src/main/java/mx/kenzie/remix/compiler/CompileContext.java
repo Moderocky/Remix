@@ -63,7 +63,7 @@ public class CompileContext implements Context {
         }
         return true;
     }
-
+    
     @Override
     public boolean hasAnyFlags(Flag... flags) {
         for (final Flag flag : flags) {
@@ -272,15 +272,21 @@ public class CompileContext implements Context {
     @Override
     public FunctionStub findFunction(String name, TypeStub... parameters) {
         final TypeStub stub = this.check();
+        final FunctionStub function;
+        
         if (stub.equals(this.getType()))
-            return this.findLocalFunction(name, parameters);
-        return stub.getMethod(name, parameters);
+            function = this.findLocalFunction(name, parameters);
+        else function = stub.getMethod(name, parameters);
+        if (function != null) return function;
+        else if (stub.equals(this.getType()))
+            return this.makeFieldFunction(name, parameters);
+        return null;
     }
     
-    private FunctionStub findLocalFunction(String name, TypeStub... parameters) {
-        for (final FunctionStub function : this.functions) {
-            if (!function.name().equals(name)) continue;
-            if (function.canAccept(parameters)) return function;
+    @Override
+    public FieldStub findField(String name) {
+        for (final FieldStub field : this.fields) {
+            if (field.name().equals(name)) return field;
         }
         return null;
     }
@@ -314,6 +320,61 @@ public class CompileContext implements Context {
     @Override
     public Bookmark bookmark() {
         return bookmarks.get(0);
+    }
+    
+    @Override
+    public void closeFields() {
+        for (final FieldStub field : this.fields) {
+            this.makeFieldFunction(field.name());
+            this.makeFieldFunction(field.name(), field.type());
+        }
+    }
+    
+    private FunctionStub findLocalFunction(String name, TypeStub... parameters) {
+        for (final FunctionStub function : this.functions) {
+            if (!function.name().equals(name)) continue;
+            if (function.canAccept(parameters)) return function;
+        }
+        return null;
+    }
+    
+    private FunctionStub makeFieldFunction(String name, TypeStub... parameters) {
+        if (parameters.length > 1) return null;
+        final boolean set = parameters.length == 1;
+        for (final FieldStub field : this.fields) {
+            if (!field.name().equals(name)) continue;
+            if (set && !field.type().canCast(parameters[0])) continue;
+            if (this.hasFieldFunction(field, parameters)) continue;
+            final TypeBuilder type = this.currentType();
+            final FunctionBuilder builder = type.startFunction(name, Modifier.PUBLIC | Modifier.SYNCHRONIZED);
+            if (set) {
+                builder.addParameter(parameters[0]);
+                builder.write(visitor -> visitor.visitVarInsn(25, 0));
+                builder.write(visitor -> visitor.visitVarInsn(25, 1));
+                builder.write(field.set());
+                builder.write(visitor -> visitor.visitInsn(177));
+            } else {
+                builder.setReturnType(field.type());
+                builder.write(visitor -> visitor.visitVarInsn(25, 0));
+                builder.write(field.get());
+                builder.write(visitor -> visitor.visitInsn(176));
+            }
+            this.functions.add(builder.getStub());
+            return builder.getStub();
+        }
+        return null;
+    }
+    
+    private boolean hasFieldFunction(FieldStub field, TypeStub... parameters) {
+        final boolean set = parameters.length > 0;
+        for (final FunctionStub stub : functions) {
+            if (!stub.name().equals(field.name())) continue;
+            if (stub.parameters().length != parameters.length) continue;
+            if (!Arrays.equals(stub.parameters(), parameters)) continue;
+            if (!set) return stub.result().equals(field.type());
+            return true;
+        }
+        return false;
     }
     
     private FunctionStub findLocalFunction(String name) {
