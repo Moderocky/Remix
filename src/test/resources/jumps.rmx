@@ -3,7 +3,7 @@ type jumps {
     func While {
         integer count { 0 }
         while count =! 10 {
-            integer count { count + 1 }
+            integer count { count + 1 } <- hello
         }
         if count =! 10 {
             system.Error {"While loop error."}
@@ -14,7 +14,7 @@ type jumps {
             integer count { count + 1 }
             break
         }
-        if count =! 1 {
+        count if =! 1 {
             system.Error {"While loop break error."}
         }
     }

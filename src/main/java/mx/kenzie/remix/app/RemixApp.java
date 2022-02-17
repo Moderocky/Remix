@@ -3,6 +3,8 @@ package mx.kenzie.remix.app;
 import mx.kenzie.remix.compiler.BuildTask;
 import mx.kenzie.remix.compiler.CompileContext;
 import mx.kenzie.remix.lang.code.*;
+import mx.kenzie.remix.lang.comment.CommentLine;
+import mx.kenzie.remix.lang.comment.SymbolComment;
 import mx.kenzie.remix.lang.field.KeywordTransient;
 import mx.kenzie.remix.lang.field.NameField;
 import mx.kenzie.remix.lang.field.TypeField;
@@ -52,6 +54,9 @@ public class RemixApp {
                 TypeStub.of(rmx.type.class),
                 TypeStub.of(rmx.pointer.class),
             },
+            new SymbolComment(),
+            new CommentLine(),
+            
             new KeywordType(),
             new TypeName(),
             new KeywordExtends(),

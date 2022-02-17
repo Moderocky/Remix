@@ -44,6 +44,12 @@ public enum ParseMode {
             return (char) reader.read() + "" + (char) reader.read();
         }
     },
+    LINE {
+        @Override
+        public String read(StreamReader reader) throws IOException {
+            return reader.readUntil(System.lineSeparator().charAt(0));
+        }
+    },
     ANY,
     STRING {
         @Override

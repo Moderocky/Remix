@@ -51,11 +51,15 @@ exit {
     x + 10
 }
 
-if true {
+if var = true {
 }
-true if {
+var if = true {
+}
+var = true if {
 }
 ```
+
+Please note this is not available for all branches: the `while` branch uses the keyword as a head marker.
 
 ### 3. Configuration
 
@@ -110,8 +114,8 @@ At the virtual machine stage:
 
 A list of control keywords available in the language.
 RMX keywords are not reserved words, but will always take preference over other usages in valid situations.
-For example, the first `house` usage in `this house house: ;` would be identified as a type (for a variable assignment)
-but if it were replaced with `cast` (see `this cast house:;`) then the `cast` keyword would take priority.
+For example, the first `house` usage in `this house house { }` would be identified as a type (for a variable assignment)
+but if it were replaced with `cast` (see `this cast house { }`) then the `cast` keyword would take priority.
 
 | Keyword | Description                                              |
 |---------|----------------------------------------------------------|
@@ -121,6 +125,8 @@ but if it were replaced with `cast` (see `this cast house:;`) then the `cast` ke
 | `func`  | Begin a function.                                        |
 | `oper`  | Begin an operator.                                       |
 | `if`    | Run a branch conditionally.                              |
+| `while` | Run a repeating branch conditionally.                    |
+| `break` | Jump to the end of the current branch.                   |
 | `new`   | Create a new object. Can be overloaded like an operator. |
 | `alloc` | Create a zero-instance of an object.                     |
 | `cast`  | Convert an object to another (compatible) type.          |
