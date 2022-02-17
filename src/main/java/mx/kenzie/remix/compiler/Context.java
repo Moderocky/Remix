@@ -145,11 +145,15 @@ public interface Context {
     
     int closeTracker();
     
+    int getTracker();
+    
     void open(Element element, String s);
     
     boolean close(Element element, String string);
     
     Bookmark bookmark();
+    
+    Bookmark bookmark(Element element);
     
     void closeFields();
 }

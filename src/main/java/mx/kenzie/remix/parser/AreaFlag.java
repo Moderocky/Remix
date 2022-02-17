@@ -14,6 +14,8 @@ public enum AreaFlag implements Flag {
     THIS_AVAILABLE,
     BODY_EXIT,
     BODY_IF,
+    BODY_WHILE,
+    BODY_BRANCH,
     INSTRUCTION_AREA,
     
 }

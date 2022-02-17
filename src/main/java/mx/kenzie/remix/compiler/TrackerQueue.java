@@ -16,6 +16,10 @@ public class TrackerQueue {
         return list.remove(0).get();
     }
     
+    public int get() {
+        return list.get(0).get();
+    }
+    
     public void count(int i) {
         for (final AtomicInteger integer : list) integer.getAndAdd(i);
     }

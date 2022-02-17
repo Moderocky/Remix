@@ -42,14 +42,6 @@ public final class FunctionStub {
         return true;
     }
     
-    public Type toASM() {
-        final Type[] types = new Type[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            types[i] = parameters[i].toASM();
-        }
-        return Type.getMethodType(result.toASM(), types);
-    }
-    
     public Consumer<MethodVisitor> write() {
         if ((modifiers & 0x00000008) != 0)
             return visitor -> visitor.visitMethodInsn(184, owner.internal(), name, this.descriptor(), owner.isInterface());
@@ -62,11 +54,15 @@ public final class FunctionStub {
     }
     
     public String descriptor() {
+        return this.toASM().getDescriptor();
+    }
+    
+    public Type toASM() {
         final Type[] types = new Type[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             types[i] = parameters[i].toASM();
         }
-        return Type.getMethodType(result.toASM(), types).getDescriptor();
+        return Type.getMethodType(result.toASM(), types);
     }
     
     public int modifiers() {

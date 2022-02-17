@@ -28,6 +28,7 @@ public class CompileContext implements Context {
     private final TrackerQueue trackers = new TrackerQueue();
     private final List<String> errors = new ArrayList<>();
     private final List<Bookmark> bookmarks = new ArrayList<>();
+    private final HashMap<Element, Bookmark> storage = new HashMap<>();
     protected volatile int maxStack;
     protected volatile int modifier;
     protected boolean bufferReady;
@@ -302,8 +303,14 @@ public class CompileContext implements Context {
     }
     
     @Override
+    public int getTracker() {
+        return trackers.get();
+    }
+    
+    @Override
     public void open(Element element, String string) {
-        this.bookmarks.add(0, new Bookmark(element));
+        final Bookmark bookmark = this.bookmark(element);
+        this.bookmarks.add(0, bookmark);
         element.open(this, string);
     }
     
@@ -314,12 +321,20 @@ public class CompileContext implements Context {
         if (bookmark.element() != element) return false;
         element.close(this, string);
         this.bookmarks.remove(0);
+        this.storage.remove(element);
         return true;
     }
     
     @Override
     public Bookmark bookmark() {
         return bookmarks.get(0);
+    }
+    
+    @Override
+    public Bookmark bookmark(Element element) {
+        if (storage.containsKey(element)) return storage.get(element);
+        this.storage.put(element, new Bookmark(element));
+        return storage.get(element);
     }
     
     @Override
