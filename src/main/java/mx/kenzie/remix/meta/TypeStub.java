@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -36,6 +37,10 @@ public class TypeStub implements java.lang.reflect.Type {
         this.methods = new HashSet<>();
         this.fields = new HashSet<>();
         this.modifiers = Modifier.PUBLIC;
+    }
+    
+    public static TypeStub of(FunctionStub stub) {
+        return new FunctionTypeStub(stub);
     }
     
     public static TypeStub of(String name, TypeStub superclass, TypeStub... interfaces) {
@@ -71,6 +76,10 @@ public class TypeStub implements java.lang.reflect.Type {
             stubs[i] = of(things[i]);
         }
         return stubs;
+    }
+    
+    public Consumer<MethodVisitor> cast() {
+        return visitor -> visitor.visitTypeInsn(192, this.toASM().getInternalName());
     }
     
     @Override
@@ -375,6 +384,43 @@ final class ArrayTypeStub extends TypeStub {
     public Type toASM() {
         return type;
     }
+}
+
+final class FunctionTypeStub extends TypeStub {
+    
+    public FunctionTypeStub(FunctionStub stub) {
+        super(findName(stub), null, TypeStub.OBJECT);
+        final FunctionStub function = new FunctionStub(Modifier.PUBLIC | Modifier.ABSTRACT, this, stub.result(), stub.name(), stub.parameters());
+        this.addMethod(function);
+    }
+    
+    public Type toASM() {
+        return Type.getType("Lrmx/func/" + name + ";");
+    }
+    
+    @Override
+    public boolean isInterface() {
+        return true;
+    }
+    
+    @Override
+    public int modifiers() {
+        return Modifier.PUBLIC | Modifier.ABSTRACT | Modifier.INTERFACE;
+    }
+    
+    private static String findName(FunctionStub stub) {
+        final String name = Long.toHexString(longHash(stub.name()));
+        final String descriptor = Long.toHexString(longHash(stub.toASM().getDescriptor()));
+        return "FN_" + name + "_" + descriptor;
+    }
+    
+    private static long longHash(String string) {
+        final byte[] bytes = string.getBytes(StandardCharsets.US_ASCII);
+        long hash = 0;
+        for (final byte b : bytes) hash = 31 * hash + (b & 0xff);
+        return hash;
+    }
+    
 }
 
 final class SealedTypeStub extends TypeStub {

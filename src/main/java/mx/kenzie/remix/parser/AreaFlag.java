@@ -17,6 +17,7 @@ public enum AreaFlag implements Flag {
     BODY_WHILE,
     BODY_BRANCH,
     INSTRUCTION_AREA,
+    BODY_LOOK,
     COMMENT,
     
 }

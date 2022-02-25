@@ -16,6 +16,7 @@ public final class FunctionStub {
     private final String name;
     private TypeStub result;
     private TypeStub[] parameters;
+    private boolean requiresCast;
     
     public FunctionStub(Method method) {
         this(method.getModifiers(), TypeStub.of(method.getDeclaringClass()), TypeStub.of(method.getReturnType()), method.getName(), TypeStub.of(method.getParameterTypes()));
@@ -31,6 +32,18 @@ public final class FunctionStub {
     
     public FunctionStub(Constructor<?> constructor) {
         this(constructor.getModifiers(), TypeStub.of(constructor.getDeclaringClass()), TypeStub.of(void.class), "<init>", TypeStub.of(constructor.getParameterTypes()));
+    }
+    
+    public void requireCast() {
+        this.requiresCast = true;
+    }
+    
+    public boolean requiresCast() {
+        return requiresCast;
+    }
+    
+    public TypeStub getFunctionalInterface() {
+        return TypeStub.of(this);
     }
     
     public boolean canAccept(TypeStub... parameters) {

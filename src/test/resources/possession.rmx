@@ -1,0 +1,25 @@
+
+
+type thing {
+
+    func Blob string string {
+        system.Print { string }
+    }
+
+}
+
+
+type intro {
+
+    func Main {
+        object thing { alloc thing }
+
+        thing look {
+            func Blob string string
+        }
+        
+        .Blob {"hello"}
+
+    }
+
+}

@@ -51,7 +51,9 @@ public class FunctionCall implements Element {
         final TypeStub[] arguments = context.pop(amount);
         final FunctionStub function = context.findFunction(name, arguments);
         if (function == null) context.fail("Unmatched function '" + name + "' from " + context.check().name());
+        assert function != null;
         context.pop(); // owner
+        if (function.requiresCast()) context.write(function.owner().cast());
         context.write(function.write());
         context.push(function.result());
     }
