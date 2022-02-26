@@ -1,5 +1,4 @@
 
-
 type thing {
 
     func Blob string string {
@@ -7,7 +6,6 @@ type thing {
     }
 
 }
-
 
 type intro {
 
@@ -17,8 +15,10 @@ type intro {
         thing look {
             func Blob string string
         }
-        
-        .Blob {"hello"}
+
+        if ?thing = 1 {
+            system.Error { "Object error." }
+        }
 
     }
 
