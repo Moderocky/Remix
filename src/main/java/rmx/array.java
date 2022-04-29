@@ -14,6 +14,12 @@ public class array implements object {
         return object.INSTANCE;
     }
     
+    public array Slice(number start, number end) {
+        final array array = new array();
+        array.list.addAll(this.list.subList(start.booleanValue(), end.booleanValue()));
+        return array;
+    }
+    
     public integer Size() {
         if (list.isEmpty()) return integer.ZERO;
         return new integer(list.size());

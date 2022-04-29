@@ -8,6 +8,7 @@ import org.junit.Test;
 import rmx.string;
 import rmx.system;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
@@ -23,6 +24,7 @@ public class ParsingTest extends RemixTest {
         parser.parse();
         final RemixCompiler compiler = new RemixCompiler(context);
         final Class<?>[] classes = compiler.loadAll();
+        compiler.writeAll(new File("target/generated-rmx-classes"));
         loaded = classes[1];
     }
     

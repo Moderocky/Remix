@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import rmx.system;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
@@ -21,8 +22,8 @@ public class OperatorTest extends RemixTest {
         final RemixParser parser = new RemixParser(stream, context);
         parser.parse();
         final RemixCompiler compiler = new RemixCompiler(context);
-//        compiler.compileAll(new File("blob/"));
         final Class<?>[] classes = compiler.loadAll();
+        compiler.writeAll(new File("target/generated-rmx-classes"));
         loaded = classes[1];
     }
     

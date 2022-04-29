@@ -38,6 +38,18 @@ public class RemixCompiler {
         }
     }
     
+    public void writeAll(File directory) throws IOException {
+        directory.mkdirs();
+        final List<Class<?>> classes = new ArrayList<>();
+        for (final TypeBuilder builder : context.internalBuilders) {
+            final File file = new File(directory, builder.getType().getTypeName() + ".class");
+            if (!file.exists()) file.createNewFile();
+            try (final OutputStream stream = new FileOutputStream(file)) {
+                stream.write(builder.writer().toByteArray());
+            }
+        }
+    }
+    
     public Class<?>[] loadAll() {
         final List<Class<?>> classes = new ArrayList<>();
         for (final TypeBuilder builder : context.internalBuilders) {
