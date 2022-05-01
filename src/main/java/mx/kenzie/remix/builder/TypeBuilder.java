@@ -37,6 +37,7 @@ public class TypeBuilder implements Builder {
         this.implement(TypeStub.of(rmx.object.class));
         this.extend(TypeStub.of(Object.class));
         for (final FunctionStub method : stub.methods()) {
+            if (method.owner() != stub) continue;
             final FunctionBuilder builder = new FunctionBuilder(method.modifiers(), stub, method.name());
             this.functions.add(builder);
             for (final TypeStub parameter : method.parameters()) builder.addParameter(parameter);
@@ -50,6 +51,10 @@ public class TypeBuilder implements Builder {
     
     public void extend(TypeStub stub) {
         this.stub.setSuperclass(stub);
+    }
+    
+    public void implementNone() {
+        this.stub.setInterfaces(new TypeStub[0]);
     }
     
     public TypeStub getType() {
@@ -166,11 +171,5 @@ public class TypeBuilder implements Builder {
         this.functions.add(builder);
         this.stub.addMethod(builder.stub);
         return builder;
-    }
-    
-    public void closeFields() {
-        for (final FieldBuilder field : this.fields) {
-        
-        }
     }
 }

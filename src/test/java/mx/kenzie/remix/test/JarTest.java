@@ -5,15 +5,13 @@ import mx.kenzie.remix.compiler.RemixCompiler;
 import mx.kenzie.remix.parser.RemixParser;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import rmx.system;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 
-public class FieldTest extends RemixTest {
+public class JarTest extends RemixTest {
     
-    private static Class<?> loaded;
+    private static RemixCompiler compiler;
     
     @BeforeClass
     public static void start() throws Throwable {
@@ -21,17 +19,18 @@ public class FieldTest extends RemixTest {
         final InputStream stream = resource("field.rmx");
         final RemixParser parser = new RemixParser(stream, context);
         parser.parse();
-        final RemixCompiler compiler = new RemixCompiler(context);
-        compiler.compileAll(new File("target/generated-rmx-classes"));
-        compiler.compileKit(new File("target/generated-rmx-classes"));
-        final Class<?>[] classes = compiler.loadAll();
-        for (final Class<?> type : classes) if (type.getSimpleName().equals("blob")) loaded = type;
+        compiler = new RemixCompiler(context);
     }
     
     @Test
     public void testMain() throws Throwable {
-        final Method method = loaded.getMethod("Main");
-        method.invoke(system.system().Allocate(loaded));
+        assert compiler != null : "Compiler was not created.";
+        final File file = new File("target/generated-rmx-results/Test.jar");
+        if (file.exists()) file.delete();
+        assert !file.exists();
+        compiler.compileKit(new File("target/generated-rmx-classes/"));
+        compiler.compileAll(new File("target/generated-rmx-classes/"));
+        compiler.writeJar(file);
+        assert file.exists();
     }
-    
 }

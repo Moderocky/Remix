@@ -17,11 +17,20 @@ type blob {
     }
 
     func Main {
+        system.Print { "Setting name directly." }
         this$name { "hello" }
+        system.Print { "Name was set to:" }
+        system.Print { this$name {} }
+
         if this$name {} =! "hello" {
             system.Error {"field value set failed"}
         }
+
+        system.Print { "Setting name indirectly." }
         this.name {"goodbye"}
+        system.Print { "Name was set to:" }
+        system.Print { this.name {} }
+
         if this.name {} = "hello" {
             system.Error {"field value set failed"}
         }
@@ -29,7 +38,10 @@ type blob {
             system.Error {"field value set failed"}
         }
 
+        system.Print { "Setting name via method." }
         this.SetName this.SetName {"hello"} {"there"}
+        system.Print { "Name was set to:" }
+        system.Print { this.name {} }
 
         bean thing { alloc bean }
         thing.thing { 5 }

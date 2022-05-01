@@ -350,10 +350,14 @@ public class CompileContext implements Context {
         final HashMap<TypeStub, TypeBuilder> map = new HashMap<>();
         for (final TypeBuilder builder : this.internalBuilders) {
             for (final FunctionStub method : builder.getType().methods()) {
+                if (method.name().contains("<")) continue;
+                if (Modifier.isStatic(method.modifiers()) || Modifier.isPrivate(method.modifiers())) continue;
                 final TypeStub stub = method.getFunctionalInterface();
                 builder.implement(stub);
                 if (map.containsKey(stub)) continue;
-                map.put(stub, new TypeBuilder(stub));
+                final TypeBuilder sub = new TypeBuilder(stub);
+                sub.implementNone();
+                map.put(stub, sub);
             }
         }
         this.internalBuilders.addAll(0, map.values());

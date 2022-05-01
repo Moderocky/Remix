@@ -22,7 +22,7 @@ public class ZeroInstanceTest extends RemixTest {
         final RemixParser parser = new RemixParser(stream, context);
         parser.parse();
         final RemixCompiler compiler = new RemixCompiler(context);
-        compiler.writeAll(new File("target/generated-rmx-classes"));
+        compiler.compileAll(new File("target/generated-rmx-classes"));
         final Class<?>[] classes = compiler.loadAll();
         for (final Class<?> type : classes) if (type.getSimpleName().equals("zero")) loaded = type;
     }

@@ -16,6 +16,8 @@ type intro {
             func Blob string string
         }
 
+        thing.Blob { "hello" }
+
         if ?thing = 1 {
             system.Error { "Object error." }
         }

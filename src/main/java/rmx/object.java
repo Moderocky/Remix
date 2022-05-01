@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 public interface object extends Serializable {
     
-    object INSTANCE = new object() {};
+    object INSTANCE = new object_0();
     
     default pointer Pointer() {
         return new pointer(system.system.getAddress(this));
@@ -109,6 +109,9 @@ public interface object extends Serializable {
     default object Or(object object) {
         new error(this.Type().String() + " does not support or.").Throw();
         return this;
+    }
+    
+    class object_0 implements object {
     }
     
 }

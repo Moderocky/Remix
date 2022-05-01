@@ -1,6 +1,7 @@
 package rmx;
 
 import mx.kenzie.jupiter.stream.InternalAccess;
+import rmx.func.FN_2479d9_9b75;
 import sun.misc.Unsafe;
 
 import java.io.PrintStream;
@@ -16,6 +17,17 @@ public class system extends PrintStream implements InternalAccess.AccessUnsafe, 
     public system() {
         super(System.out);
         this.unsafe = this.getUnsafe();
+    }
+    
+    public static void main(String... arguments) {
+        if (arguments.length < 1) return;
+        try {
+            Class<?> thing = Class.forName(arguments[0], true, rmx.system.class.getClassLoader());
+            final FN_2479d9_9b75 object = (FN_2479d9_9b75) system.Allocate(thing);
+            object.Main();
+        } catch (Throwable exception) {
+            system.Error(new error(exception.getMessage()));
+        }
     }
     
     public static system system() {
