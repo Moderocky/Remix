@@ -156,4 +156,6 @@ public interface Context {
     Bookmark bookmark(Element element);
     
     void closeFields();
+    
+    void finish();
 }

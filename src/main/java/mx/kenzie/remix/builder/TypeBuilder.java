@@ -32,17 +32,28 @@ public class TypeBuilder implements Builder {
         this.stub = TypeStub.of(name, TypeStub.of(Object.class), TypeStub.of(rmx.object.class));
     }
     
-    public TypeStub getType() {
-        return stub;
+    public TypeBuilder(TypeStub stub) {
+        this.stub = stub;
+        this.implement(TypeStub.of(rmx.object.class));
+        this.extend(TypeStub.of(Object.class));
+        for (final FunctionStub method : stub.methods()) {
+            final FunctionBuilder builder = new FunctionBuilder(method.modifiers(), stub, method.name());
+            this.functions.add(builder);
+            for (final TypeStub parameter : method.parameters()) builder.addParameter(parameter);
+        }
+    }
+    
+    public void implement(TypeStub stub) {
+        final TypeStub[] interfaces = this.add(this.stub.interfaces(), stub);
+        this.stub.setInterfaces(interfaces);
     }
     
     public void extend(TypeStub stub) {
         this.stub.setSuperclass(stub);
     }
     
-    public void implement(TypeStub stub) {
-        final TypeStub[] interfaces = this.add(this.stub.interfaces(), stub);
-        this.stub.setInterfaces(interfaces);
+    public TypeStub getType() {
+        return stub;
     }
     
     public FieldBuilder startField(int modifiers, String name, TypeStub type) {
@@ -62,7 +73,9 @@ public class TypeBuilder implements Builder {
         }
         for (final FunctionBuilder function : functions) {
             final MethodVisitor visitor = writer.visitMethod(function.stub.modifiers(), function.stub.name(), function.stub.descriptor(), null, new String[0]);
-            function.accept(visitor);
+            if (Modifier.isAbstract(function.stub.modifiers()) || Modifier.isNative(function.stub.modifiers()))
+                visitor.visitEnd();
+            else function.accept(visitor);
         }
         return writer;
     }

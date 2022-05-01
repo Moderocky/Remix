@@ -394,20 +394,6 @@ final class FunctionTypeStub extends TypeStub {
         this.addMethod(function);
     }
     
-    public Type toASM() {
-        return Type.getType("Lrmx/func/" + name + ";");
-    }
-    
-    @Override
-    public boolean isInterface() {
-        return true;
-    }
-    
-    @Override
-    public int modifiers() {
-        return Modifier.PUBLIC | Modifier.ABSTRACT | Modifier.INTERFACE;
-    }
-    
     private static String findName(FunctionStub stub) {
         final String name = Long.toHexString(longHash(stub.name()));
         final String descriptor = Long.toHexString(longHash(stub.toASM().getDescriptor()));
@@ -419,6 +405,20 @@ final class FunctionTypeStub extends TypeStub {
         long hash = 0;
         for (final byte b : bytes) hash = 31 * hash + (b & 0xff);
         return hash;
+    }
+    
+    @Override
+    public int modifiers() {
+        return Modifier.PUBLIC | Modifier.ABSTRACT | Modifier.INTERFACE;
+    }
+    
+    @Override
+    public boolean isInterface() {
+        return true;
+    }
+    
+    public Type toASM() {
+        return Type.getType("Lrmx/func/" + name + ";");
     }
     
 }

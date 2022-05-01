@@ -5,7 +5,6 @@ import mx.kenzie.remix.lang.Element;
 import mx.kenzie.remix.lang.Keyword;
 import mx.kenzie.remix.meta.TypeStub;
 import mx.kenzie.remix.parser.AreaFlag;
-import mx.kenzie.remix.parser.ConsumerFlag;
 
 
 public class KeywordLook implements Keyword, Element {

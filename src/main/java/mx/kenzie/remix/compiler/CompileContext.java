@@ -345,6 +345,20 @@ public class CompileContext implements Context {
         }
     }
     
+    @Override
+    public void finish() {
+        final HashMap<TypeStub, TypeBuilder> map = new HashMap<>();
+        for (final TypeBuilder builder : this.internalBuilders) {
+            for (final FunctionStub method : builder.getType().methods()) {
+                final TypeStub stub = method.getFunctionalInterface();
+                builder.implement(stub);
+                if (map.containsKey(stub)) continue;
+                map.put(stub, new TypeBuilder(stub));
+            }
+        }
+        this.internalBuilders.addAll(0, map.values());
+    }
+    
     private FunctionStub findLocalFunction(String name, TypeStub... parameters) {
         for (final FunctionStub function : this.functions) {
             if (!function.name().equals(name)) continue;

@@ -3,7 +3,6 @@ package mx.kenzie.remix.test;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class PossessionTest {
     

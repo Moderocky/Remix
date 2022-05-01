@@ -22,9 +22,9 @@ public class JumpsTest extends RemixTest {
         final RemixParser parser = new RemixParser(stream, context);
         parser.parse();
         final RemixCompiler compiler = new RemixCompiler(context);
-        final Class<?>[] classes = compiler.loadAll();
         compiler.writeAll(new File("target/generated-rmx-classes"));
-        loaded = classes[0];
+        final Class<?>[] classes = compiler.loadAll();
+        for (final Class<?> type : classes) if (type.getSimpleName().equals("jumps")) loaded = type;
     }
     
     @Test

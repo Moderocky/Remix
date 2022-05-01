@@ -16,12 +16,15 @@ public class RemixCompiler {
     
     public RemixCompiler(CompileContext context) {
         this.context = context;
+        this.context.finish();
     }
     
-    public void compile(OutputStream stream) throws IOException {
+    public boolean compile(OutputStream stream) throws IOException {
+        if (context.internalBuilders.isEmpty()) return false;
         final TypeBuilder builder = context.internalBuilders.remove(0);
         final byte[] bytes = builder.writer().toByteArray();
         stream.write(bytes);
+        return !context.internalBuilders.isEmpty();
     }
     
     public void compileAll(File directory) {
@@ -40,7 +43,6 @@ public class RemixCompiler {
     
     public void writeAll(File directory) throws IOException {
         directory.mkdirs();
-        final List<Class<?>> classes = new ArrayList<>();
         for (final TypeBuilder builder : context.internalBuilders) {
             final File file = new File(directory, builder.getType().getTypeName() + ".class");
             if (!file.exists()) file.createNewFile();
